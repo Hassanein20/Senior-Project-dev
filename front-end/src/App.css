@@ -34,7 +34,6 @@
   width: 100vw;
 }
 
-/* Custom background images */
 .RegistrationContainer {
   background-image: url("./Assets/RegistrationBG.jpg");
 }
@@ -43,7 +42,6 @@
   background-image: url("./Assets/GettingInfo.jpg");
 }
 
-/* Custom slider thumb (Bootstrap doesn't style these) */
 .ActivityLevel::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 20px;

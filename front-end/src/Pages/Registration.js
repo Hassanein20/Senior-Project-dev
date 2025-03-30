@@ -1,75 +1,46 @@
 import React, { useState } from "react";
-import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import {
-  Form,
-  Container,
-  Card,
-  Button,
-  Row,
-  Col,
-  FloatingLabel,
-} from "react-bootstrap";
+import { Container, Card, Button, Form, Row, Col } from "react-bootstrap";
+import { FormInput } from "../Components/FormInput";
+import { emailSchema, passwordSchema } from "../Components/Validators";
 
 const Registration = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
 
-  const emailSchema = z.string().email({ message: "Invalid email address" });
-  const passwordSchema = z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters long" })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .regex(/[0-9]/, { message: "Password must contain at least one number" })
-    .regex(/[^A-Za-z0-9]/, {
-      message: "Password must contain at least one special character",
-    });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-    // Clear errors when user starts typing
-    setErrors({
-      ...errors,
-      [name]: "",
-    });
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const validateForm = () => {
-    let isValid = true;
-    const newErrors = { email: "", password: "" };
+    const validationResult = {
+      email: "",
+      password: "",
+    };
 
     try {
       emailSchema.parse(formData.email);
-    } catch (err) {
-      newErrors.email = err.errors[0].message;
-      isValid = false;
+    } catch (emailError) {
+      validationResult.email = emailError.errors[0].message;
     }
 
     try {
       passwordSchema.parse(formData.password);
-    } catch (err) {
-      newErrors.password = err.errors[0].message;
-      isValid = false;
+    } catch (passwordError) {
+      validationResult.password = passwordError.errors[0].message;
     }
 
-    setErrors(newErrors);
-    return isValid;
+    setErrors(validationResult);
+    return !validationResult.email && !validationResult.password;
   };
-
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -88,43 +59,28 @@ const Registration = () => {
               style={{ backgroundColor: "rgba(255, 255, 255, 0.7)" }}
             >
               <Form onSubmit={handleSubmit}>
-                <h3 className='text-center mb-4'>Sign UP</h3>
+                <h3 className='text-center mb-4'>Sign Up</h3>
 
-                <FloatingLabel
-                  controlId='emailInput'
+                <FormInput
                   label='Email'
-                  className='mb-3'
-                >
-                  <Form.Control
-                    type='email'
-                    name='email'
-                    value={formData.email}
-                    onChange={handleChange}
-                    isInvalid={!!errors.email}
-                    placeholder=' '
-                  />
-                </FloatingLabel>
-                <Form.Control.Feedback type='invalid'>
-                  {errors.email}
-                </Form.Control.Feedback>
+                  type='email'
+                  name='email'
+                  value={formData.email}
+                  error={errors.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  placeholder=' '
+                />
 
-                <FloatingLabel
-                  className='mb-4'
-                  controlId='passwordinput'
+                <FormInput
                   label='Password'
-                >
-                  <Form.Control
-                    type='password'
-                    name='password'
-                    value={formData.password}
-                    onChange={handleChange}
-                    isInvalid={!!errors.password}
-                    placeholder=' '
-                  />
-                  <Form.Control.Feedback type='invalid' className='d-block'>
-                    {errors.password}
-                  </Form.Control.Feedback>
-                </FloatingLabel>
+                  type='password'
+                  name='password'
+                  value={formData.password}
+                  error={errors.password}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  placeholder=' '
+                  className='mb-4'
+                />
 
                 <div className='d-grid'>
                   <Button variant='primary' type='submit'>
