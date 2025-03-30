@@ -1,76 +1,53 @@
-@import url("https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
-
+/* Updated CSS (keep this for backgrounds/font overrides) */
 * {
-  box-sizing: border-box;
-  font-family: "Mulish", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-family: "Mulish", sans-serif; /* Bootstrap will inherit this */
 }
 
-body {
-  background-image: url("./Assets/background1.jpg");
-  background-position: center;
+:root {
+  --color-main: rgba(28, 227, 127, 1);
+  --color-text: rgba(56, 58, 63, 1);
+  --color-dark: #1f2124;
+  --color-gray: #677;
+  --color-bg: #f3f6f9;
+  --color-light: #acb4bd;
+  --color-lighter: #f9f9f9;
+  --color-white: #fff;
+  --color-border: rgba(227, 28, 128, 1);
+}
+
+.dark {
+  --color-main: rgba(28, 227, 127, 1);
+  --color-text: rgba(214, 209, 209, 1);
+  --color-dark: #f5f6f7;
+  --color-gray: #999;
+  --color-bg: #1f2124;
+  --color-lighter: #292a2c;
+  --color-white: #2e3235;
+  --color-border: rgba(227, 28, 128, 1);
+}
+
+.RegistrationContainer,
+.GettingInfoContainer {
   background-size: cover;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-}
-
-.App {
+  background-position: center;
   height: 100vh;
   width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
-.formRegistration {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 0;
-  border-radius: 20px;
-  padding: 50px 80px;
-  background-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.formRegistration h3 {
-  margin-top: 0px;
-  font-size: 1.8rem;
+/* Custom background images */
+.RegistrationContainer {
+  background-image: url("./Assets/RegistrationBG.jpg");
 }
 
-.email,
-.pass {
-  background-color: transparent;
-  padding: 0 0 10px 10px;
-}
-.inemail,
-.inpass {
-  background-color: rgba(255, 255, 255, 0.7);
-  border: 0;
-  border-radius: 10px;
-  outline: none;
-  padding: 10px;
+.GettingInfoContainer {
+  background-image: url("./Assets/GettingInfo.jpg");
 }
 
-.inputs {
-  display: flex;
-  flex-direction: column;
-  padding: 2px;
-  margin: 2px;
-  padding: 5px;
-}
-
-.RSubmit {
-  margin-top: 30px;
-  border: 0;
-  background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 7px;
-  padding: 8px;
-  font-size: 1rem;
-}
-
-.RSubmit:hover {
-  /* background-color: rgba(1, 174, 87, 0.7); */
+/* Custom slider thumb (Bootstrap doesn't style these) */
+.ActivityLevel::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--color-bg);
+  border-radius: 50%;
 }
