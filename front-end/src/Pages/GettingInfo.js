@@ -19,11 +19,11 @@ const GettingInfo = () => {
   const [errors, setErrors] = useState({});
 
   const activityLevels = [
-    "Sedentary",
-    "Light",
-    "Moderate",
-    "Active",
-    "Very Active",
+    "Sedentary: No or little exercise",
+    "Light: Sports 1-3 days/week",
+    "Moderate: Sports 3-5 days/week",
+    "Active: Sports 6-7 days/week",
+    "Very Active: Training twice a day",
   ];
 
   const handleChange = (field, value) => {
@@ -65,9 +65,6 @@ const GettingInfo = () => {
       formData.date.day
     );
 
-    // Age calculation logic remains the same
-    // Navigation logic remains the same
-
     navigate("/User", { state: formData });
   };
 
@@ -87,7 +84,7 @@ const GettingInfo = () => {
                   value={formData.fullName}
                   error={errors.fullName}
                   onChange={(e) => handleChange("fullName", e.target.value)}
-                  autofocus
+                  autoFocus
                   required
                   placeholder=''
                 />

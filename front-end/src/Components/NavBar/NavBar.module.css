@@ -1,0 +1,14 @@
+.navbar {
+  background-color: var(--color-border);
+  z-index: 99;
+}
+
+.navlink {
+  color: white !important;
+  border-bottom: 2px solid transparent !important;
+  transition: border-color 0.3s ease-in-out !important;
+}
+
+.navlink:hover {
+  border-color: var(--color-main) !important;
+}

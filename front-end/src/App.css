@@ -1,6 +1,6 @@
-/* Updated CSS (keep this for backgrounds/font overrides) */
 * {
-  font-family: "Mulish", sans-serif; /* Bootstrap will inherit this */
+  font-family: "Mulish", sans-serif;
+  box-sizing: border-box;
 }
 
 :root {
