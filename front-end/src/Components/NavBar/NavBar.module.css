@@ -1,5 +1,5 @@
 .navbar {
-  background-color: var(--color-border);
+  background-color: var(--color-primary);
   z-index: 99;
 }
 
@@ -9,6 +9,39 @@
   transition: border-color 0.3s ease-in-out !important;
 }
 
+.active {
+  color: var(--color-secondary) !important;
+  border-color: var(--color-secondary) !important;
+}
 .navlink:hover {
-  border-color: var(--color-main) !important;
+  border-color: var(--color-secondary) !important;
+  color: var(--color-secondary) !important;
+}
+
+.navbarToggle {
+  background-color: transparent !important;
+  border-color: var(--color-primary) !important;
+}
+
+.themetoggle {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  position: relative;
+  border: 0px solid var(--color-secondary);
+  background-color: transparent !important;
+}
+
+.themetoggle i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  transition: all 0.3s ease-in-out !important;
+}
+
+.sun {
+  color: rgba(255, 223, 34, 1);
 }

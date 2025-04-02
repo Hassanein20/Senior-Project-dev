@@ -4,15 +4,20 @@ import Registration from "./Pages/Registration";
 import GettingInfo from "./Pages/GettingInfo";
 import Home from "./Pages/Home";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ThemeProvider } from "./Components/ThemeContext";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path='/Home' element={<Home />} />
-        <Route path='/SignUp' element={<Registration />} />
-        <Route path='/SignUp/GettingInfo' element={<GettingInfo />} />
-      </Routes>
+      <ThemeProvider>
+        <div>
+          <Routes>
+            <Route path='/Home' element={<Home />} />
+            <Route path='/SignUp' element={<Registration />} />
+            <Route path='/SignUp/GettingInfo' element={<GettingInfo />} />
+          </Routes>
+        </div>
+      </ThemeProvider>
     </Router>
   );
 }

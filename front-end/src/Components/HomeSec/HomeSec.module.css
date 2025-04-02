@@ -1,0 +1,7 @@
+.Home {
+  background-image: url("../../Assets/Home.webp");
+  background-size: cover;
+  background-position: center;
+  height: 87vh;
+  width: 100vw;
+}

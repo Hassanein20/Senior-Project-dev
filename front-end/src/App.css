@@ -4,26 +4,32 @@
 }
 
 :root {
-  --color-main: rgba(28, 227, 127, 1);
+  --color-primary: rgba(28, 227, 127, 1);
+  --color-secondary: rgba(255, 140, 66, 1);
   --color-text: rgba(56, 58, 63, 1);
   --color-dark: #1f2124;
   --color-gray: #677;
   --color-bg: #f3f6f9;
   --color-light: #acb4bd;
   --color-lighter: #f9f9f9;
+  --color-card: rgba(255, 255, 255, 0.7);
   --color-white: #fff;
   --color-border: rgba(227, 28, 128, 1);
+  --color-theme: light;
 }
 
 .dark {
-  --color-main: rgba(28, 227, 127, 1);
+  --color-primary: rgba(18, 160, 89, 1);
+  --color-secondary: rgba(200, 85, 35, 1);
   --color-text: rgba(214, 209, 209, 1);
   --color-dark: #f5f6f7;
   --color-gray: #999;
   --color-bg: #1f2124;
-  --color-lighter: #292a2c;
+  --color-lighter: rgba(41, 42, 44, 1);
+  --color-card: rgba(41, 42, 44, 0.7);
   --color-white: #2e3235;
   --color-border: rgba(227, 28, 128, 1);
+  --color-theme: dark;
 }
 
 .RegistrationContainer,
@@ -34,18 +40,50 @@
   width: 100vw;
 }
 
-.RegistrationContainer {
-  background-image: url("./Assets/RegistrationBG.jpg");
-}
-
-.GettingInfoContainer {
-  background-image: url("./Assets/GettingInfo.jpg");
-}
-
 .ActivityLevel::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
   background: var(--color-bg);
   border-radius: 50%;
+}
+
+.button {
+  border-radius: 4px !important;
+  border: 2px solid var(--color-secondary) !important;
+  padding: 7px 14px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+  background-color: var(--color-secondary) !important;
+  transition: transform 0.5s ease-in-out !important;
+}
+
+.button:hover {
+  background-color: transparent !important;
+  color: var(--color-secondary) !important;
+}
+
+.button:active {
+  transform: scale(0.9);
+}
+
+p,
+li {
+  font-size: 0.9rem;
+  color: var(--color-light);
+  line-height: 1.6;
+  transition: all 0.4s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-primary);
+  font-weight: bold;
+  text-transform: capitalize;
+  transition: all 0.4 ease;
 }
