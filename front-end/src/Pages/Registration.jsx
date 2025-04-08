@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Card, Button, Form, Row, Col } from "react-bootstrap";
-import { FormInput } from "../Components/FormInput";
-import { emailSchema, passwordSchema } from "../Components/Validators";
+import { Container, Card, Button, Form, Row, Col, Nav } from "react-bootstrap";
+import { FormInput } from "../Components/Registration/FormInput";
+import {
+  emailSchema,
+  passwordSchema,
+} from "../Components/Registration/Validators";
 import Background from "../Assets/RegistrationBG.webp";
+import { Link } from "react-router-dom";
 const Registration = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -45,7 +49,7 @@ const Registration = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      navigate("/SignUp/GettingInfo");
+      navigate("/User");
     }
   };
 
@@ -62,7 +66,7 @@ const Registration = () => {
               style={{ backgroundColor: "var(--color-card)" }}
             >
               <Form onSubmit={handleSubmit}>
-                <h3 className='text-center mb-4'>Sign Up</h3>
+                <h3 className='text-center mb-4'>Sign In</h3>
 
                 <FormInput
                   label='Email'
@@ -83,6 +87,27 @@ const Registration = () => {
                   onChange={(e) => handleChange("password", e.target.value)}
                   placeholder=' '
                 />
+
+                <Col
+                  md={6}
+                  lg={5}
+                  xl={4}
+                  className='d-flex align-items-center justify-content-end gap-2 w-100'
+                >
+                  <p className='m-0' style={{ fontSize: "0.7rem" }}>
+                    Don't Have an account
+                  </p>
+                  <Nav.Link
+                    as={Link}
+                    to={"/SignUp/GettingInfo"}
+                    style={{
+                      color: "var(--color-primary)",
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    SignUp
+                  </Nav.Link>
+                </Col>
 
                 <div className='d-grid'>
                   <Button type='submit' className='mt-4 button'>

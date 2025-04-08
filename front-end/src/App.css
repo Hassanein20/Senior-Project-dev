@@ -6,7 +6,8 @@
 :root {
   --color-primary: rgba(28, 227, 127, 1);
   --color-secondary: rgba(255, 140, 66, 1);
-  --color-text: rgba(56, 58, 63, 1);
+  --color-text: rgba(33, 33, 33, 0.87);
+  --color-text2: rgba(33, 33, 33, 0.6);
   --color-dark: #1f2124;
   --color-gray: #677;
   --color-bg: #f3f6f9;
@@ -21,15 +22,20 @@
 .dark {
   --color-primary: rgba(18, 160, 89, 1);
   --color-secondary: rgba(200, 85, 35, 1);
-  --color-text: rgba(214, 209, 209, 1);
+  --color-text: rgba(255, 255, 255, 0.87);
+  --color-text2: rgba(255, 255, 255, 0.6);
   --color-dark: #f5f6f7;
   --color-gray: #999;
   --color-bg: #1f2124;
   --color-lighter: rgba(41, 42, 44, 1);
   --color-card: rgba(41, 42, 44, 0.7);
-  --color-white: #2e3235;
+  --color-white: #696e73;
   --color-border: rgba(227, 28, 128, 1);
   --color-theme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 .RegistrationContainer,
@@ -71,7 +77,7 @@
 p,
 li {
   font-size: 0.9rem;
-  color: var(--color-light);
+  color: var(--color-text);
   line-height: 1.6;
   transition: all 0.4s ease;
 }

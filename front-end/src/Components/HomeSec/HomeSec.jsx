@@ -1,41 +1,48 @@
 import React from "react";
-import { Button, Col, Container, Row } from "react-bootstrap";
+import { Button, Container, Row } from "react-bootstrap";
 import style from "./HomeSec.module.css";
 const HomeSec = () => {
   return (
     <div>
       <Container fluid className={`${style.Home}`}>
         <Row>
-          <Col className='col-lg-6 col-md-6 col-12'></Col>
-          <div className='w-95'>
+          <div
+            className='w-50 justify-content-start'
+            style={{
+              marginTop: "10vh",
+              marginLeft: "5vw",
+            }}
+          >
             <h6
-              className='fs-4'
               style={{
                 color: "var(--color-primary)",
                 textShadow: "0px 5px 5px black",
+                fontSize: "2vw",
               }}
             >
-              Welcome To The Best Nutrition Web App
+              The Best Nutrition Web App
             </h6>
             <h2
-              className='fs-1'
-              style={{ color: "white", textShadow: "0px 5px 5px black" }}
+              style={{
+                textShadow: "0px 5px 5px black",
+                fontSize: "5vw",
+                color: "var(--color-white)",
+              }}
             >
               Acheive Your Goals
             </h2>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat
-              sequi veritatis beatae. Earum molestiae vitae neque ea. Vero,
-              harum asperiores. Veritatis porro voluptatibus at voluptates
-              deserunt ipsam ratione blanditiis a accusamus odio dolor optio
-              exercitationem facilis repellat ipsa corporis atque, eum
-              repudiandae quo impedit! Dolore molestias quo, hic soluta porro
-              quos ullam. Vel cupiditate consectetur, tempora molestiae sed id
-              quisquam asperiores nemo at quo in ducimus, blanditiis corrupti
-              obcaecati et ea odio officia aperiam iusto enim voluptates quae
-              voluptatum autem! Harum quidem libero quod possimus repellat, id
-              autem reiciendis minima. Quas incidunt ad dolores? Necessitatibus
-              asperiores deserunt commodi accusamus atque!
+            <p
+              style={{
+                color: "var(--color-white)",
+                textShadow: "0px 5px 5px black",
+              }}
+            >
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Perferendis dicta, consequuntur sed commodi alias repudiandae id
+              aut quia dolorem, atque, impedit molestiae quis unde ut? Quos
+              quibusdam nisi, mollitia omnis harum fugiat id nemo laboriosam
+              deleniti saepe ratione corrupti! Ex amet quos eum fuga voluptatem
+              voluptatibus officiis deserunt blanditiis debitis?
             </p>
             <Button className='mt-4 button'>Lets Start!</Button>
           </div>

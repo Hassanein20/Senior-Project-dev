@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Card, Button, Form, Row, Col } from "react-bootstrap";
-import { FormInput } from "../Components/FormInput";
-import { RadioGroup } from "../Components/RadioGroup";
-import { DatePicker } from "../Components/DatePicker";
+import { FormInput } from "../Components/Registration/FormInput";
+import { RadioGroup } from "../Components/Registration/RadioGroup";
+import { DatePicker } from "../Components/Registration/DatePicker";
 import Background from "./../Assets/GettingInfo.webp";
 
 const GettingInfo = () => {
