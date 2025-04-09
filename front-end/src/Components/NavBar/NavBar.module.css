@@ -3,6 +3,13 @@
   z-index: 99;
 }
 
+.navname {
+  margin-bottom: "0" !important;
+  margin-left: "5px" !important;
+  font-size: "1.5rem" !important;
+  font-weight: "600" !important;
+}
+
 .navlink {
   color: white !important;
   border-bottom: 2px solid transparent !important;

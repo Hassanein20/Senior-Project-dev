@@ -1,52 +1,64 @@
 import React from "react";
 import { Button, Container, Row } from "react-bootstrap";
 import style from "./HomeSec.module.css";
+import { Link } from "react-router-dom";
 const HomeSec = () => {
   return (
     <div>
-      <Container fluid className={`${style.Home}`}>
+      <Container
+        fluid
+        className={`${style.Home}`}
+        style={{ overflow: "auto", scrollbarWidth: "none" }}
+      >
         <Row>
           <div
             className='w-50 justify-content-start'
             style={{
-              marginTop: "10vh",
-              marginLeft: "5vw",
+              marginTop: "7vh",
+              marginLeft: "3vw",
             }}
           >
             <h6
               style={{
                 color: "var(--color-primary)",
                 textShadow: "0px 5px 5px black",
-                fontSize: "2vw",
               }}
             >
-              The Best Nutrition Web App
+              Your Journey to Better Health Starts Here
             </h6>
             <h2
               style={{
                 textShadow: "0px 5px 5px black",
-                fontSize: "5vw",
-                color: "var(--color-white)",
+                color: "var(--color-secondary)",
+                padding: "2vh",
               }}
             >
-              Acheive Your Goals
+              Track Smarter. Eat Better. Acheive Your Goals.
             </h2>
             <p
               style={{
                 color: "var(--color-white)",
                 textShadow: "0px 5px 5px black",
+                paddingLeft: "2vw",
               }}
             >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Perferendis dicta, consequuntur sed commodi alias repudiandae id
-              aut quia dolorem, atque, impedit molestiae quis unde ut? Quos
-              quibusdam nisi, mollitia omnis harum fugiat id nemo laboriosam
-              deleniti saepe ratione corrupti! Ex amet quos eum fuga voluptatem
-              voluptatibus officiis deserunt blanditiis debitis?
+              Whether you're aiming to lose weight, build muscles, or explore
+              diet like KETO or VEGAN, our platform calculates your exact
+              calorie needs and simplifies tracking with instant micronutrient
+              insights. Log meals effortlessly, visualize progress with daily
+              graphs, and get personalized advice from certified dietitians.
+              Start today - your goals are just a click away.
             </p>
-            <Button className='mt-4 button'>Lets Start!</Button>
           </div>
         </Row>
+        <Button
+          className='button'
+          style={{ marginTop: "5vh", marginLeft: "5vw", marginBottom: "2vh" }}
+          as={Link}
+          to='/SignUp/GettingInfo'
+        >
+          Lets Start!
+        </Button>
       </Container>
     </div>
   );
