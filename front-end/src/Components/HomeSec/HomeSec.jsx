@@ -4,15 +4,15 @@ import style from "./HomeSec.module.css";
 import { Link } from "react-router-dom";
 const HomeSec = () => {
   return (
-    <div>
+    <>
       <Container
         fluid
         className={`${style.Home}`}
-        style={{ overflow: "auto", scrollbarWidth: "none" }}
+        style={{ overflow: "auto", scrollbarWidth: "none", paddingTop: "8vh" }}
       >
         <Row>
           <div
-            className='w-50 justify-content-start'
+            className={`justify-content-start ${style.Content}`}
             style={{
               marginTop: "7vh",
               marginLeft: "3vw",
@@ -60,7 +60,7 @@ const HomeSec = () => {
           Lets Start!
         </Button>
       </Container>
-    </div>
+    </>
   );
 };
 

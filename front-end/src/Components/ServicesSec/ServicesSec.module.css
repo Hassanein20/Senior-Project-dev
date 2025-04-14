@@ -1,0 +1,34 @@
+.Screen {
+  background-image: url("../../Assets/Services.webp");
+  background-position: center;
+  background-size: cover;
+  height: 100vh !important;
+  width: 100vw !important;
+}
+
+@media (max-width: 576px) {
+  .Content {
+    width: 45vw !important;
+  }
+  .image {
+    margin-right: 15vw;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 992px) {
+  .Content {
+    width: 45vw !important;
+  }
+  .image {
+    margin-right: 10vw !important;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1400px) {
+  .Content {
+    width: 45vw !important;
+  }
+  .image {
+    margin-right: 10vw !important;
+  }
+}

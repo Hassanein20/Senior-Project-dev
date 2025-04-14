@@ -38,7 +38,7 @@ const NavBar = () => (
             margin: "0",
             fontWeight: "600",
             color: "white",
-            fontFamily: "",
+            fontFamily: "Inter, sans-serif",
           }}
         >
           NutriSync

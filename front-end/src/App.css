@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
 * {
   font-family: "Mulish", sans-serif;
   box-sizing: border-box;
@@ -99,11 +101,17 @@ h6 {
   h2 {
     font-size: 1rem !important;
   }
+  h3 {
+    font-size: 0.95rem !important;
+  }
   h6 {
     font-size: 0.9rem !important;
   }
   p {
     font-size: 0.7rem !important;
+  }
+  html {
+    scroll-padding-top: 55px;
   }
 }
 
@@ -111,11 +119,17 @@ h6 {
   h2 {
     font-size: 5vw !important;
   }
+  h3 {
+    font-size: 4vw !important;
+  }
   h6 {
     font-size: 3vw !important;
   }
   p {
     font-size: 2vw !important;
+  }
+  html {
+    scroll-padding-top: 55px;
   }
 }
 
@@ -123,10 +137,16 @@ h6 {
   h2 {
     font-size: 4vw !important;
   }
+  h3 {
+    font-size: 3vw !important;
+  }
   h6 {
     font-size: 2.5vw !important;
   }
   p {
     font-size: 1.5vw !important;
+  }
+  html {
+    scroll-padding-top: 64px;
   }
 }

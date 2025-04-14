@@ -92,17 +92,17 @@ const Registration = () => {
                   md={6}
                   lg={5}
                   xl={4}
-                  className='d-flex align-items-center justify-content-end gap-2 w-100'
+                  className=' d-flex flex-column align-items-center justify-content-center gap-2 w-100'
                 >
                   <p className='m-0' style={{ fontSize: "0.7rem" }}>
-                    Don't Have an account
+                    Don't Have an account?
                   </p>
                   <Nav.Link
                     as={Link}
                     to={"/SignUp/GettingInfo"}
                     style={{
                       color: "var(--color-primary)",
-                      fontSize: "0.7rem",
+                      fontSize: "0.8rem",
                     }}
                   >
                     SignUp

@@ -1,7 +1,8 @@
 import { React } from "react";
 import NavBar from "../Components/NavBar/NavBar";
 import HomeSec from "../Components/HomeSec/HomeSec";
-import AboutSec from "../Components/About/AboutSec";
+import AboutSec from "../Components/AboutSec/AboutSec";
+import ServicesSec from "../Components/ServicesSec/ServicesSec";
 const Home = () => {
   return (
     <>
@@ -11,11 +12,15 @@ const Home = () => {
       >
         <NavBar />
       </header>
-      <section id='Home' style={{ paddingTop: "8vh" }}>
+      <section id='Home'>
         <HomeSec />
       </section>
+      <hr />
       <section id='About'>
         <AboutSec />
+      </section>
+      <section id='Services'>
+        <ServicesSec />
       </section>
     </>
   );
