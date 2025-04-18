@@ -1,0 +1,7 @@
+.Screen {
+  background-image: url("../../Assets/Contact.webp");
+  background-size: cover;
+  background-position: center;
+  width: 100vw;
+  height: 100vh;
+}

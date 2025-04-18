@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import style from "./ServicesSec.module.css";
 import Tracking from "../../Assets/Tracking.png";
 
@@ -33,8 +33,43 @@ const ServicesSec = () => {
             </h3>
           </div>
         </Row>
-        <Row className={`d-flex justify-content-end ${style.image}`}>
-          <img src={Tracking} alt='Traking' style={{ width: "30vw" }} />
+        <Row>
+          <Col className={`d-flex justify-content-end ${style.column}`}>
+            <img src={Tracking} alt='Traking' style={{ width: "15vw" }} />
+          </Col>
+          <Col className={`d-flex justify-content-center align-items-center`}>
+            <p style={{ color: "var(--color-primary)", fontWeight: "bold" }}>
+              Your Goals, Your Body, Your Plan - Calculated in Seconds.
+            </p>
+          </Col>
+        </Row>
+        <Row className='justify-content-end'>
+          <p
+            className={`${style.Content}`}
+            style={{ color: "var(--color-light)" }}
+          >
+            Get a tailored calorie goal based on your age, weight, activity
+            level, and goals (weight loss, muscle gain, maintenance). See your
+            daily protein, carb, and fat targets broken down.
+          </p>
+        </Row>
+        <Row className='justify-content-end'>
+          <p
+            className={`${style.Content}`}
+            style={{ color: "var(--color-light)" }}
+          >
+            Track daily calories, micronutrients, and weight trends with
+            interactive graphs. Export reports to share with your dietitian.
+          </p>
+        </Row>
+        <Row className='justify-content-end'>
+          <p
+            className={`${style.Content}`}
+            style={{ color: "var(--color-light)" }}
+          >
+            Log meals in seconds with our 10,000+ food database. Scan barcodes
+            for instant macros—no more guesswork!
+          </p>
         </Row>
       </Container>
     </>
