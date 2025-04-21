@@ -1,22 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
-  const nonZeroData = data.filter((item) => item.value > 0);
-  const total = nonZeroData.reduce((acc, item) => acc + item.value, 0);
+  const [grams, setGrams] = useState(100);
+  const scaledData = data.map((item) => ({
+    ...item,
+    scaledValue: item.value * (grams / 100),
+  }));
+
+  // Filter and calculate totals
+  const nonZeroData = scaledData.filter((item) => item.scaledValue > 0);
+  const totalGrams = nonZeroData.reduce(
+    (acc, item) => acc + item.scaledValue,
+    0
+  );
+
+  // Calorie calculations
+  const calculateCalories = (nutrient) => {
+    const multiplier = nutrient.label === "Fats" ? 9 : 4;
+    return nutrient.scaledValue * multiplier;
+  };
+  const totalCalories = scaledData.reduce(
+    (acc, item) => acc + calculateCalories(item),
+    0
+  );
+
+  // Chart calculations
   const radius = 90 - thickness / 2;
   const circumference = 2 * Math.PI * radius;
   let accumulatedLength = 0;
 
   return (
     <div className='text-center'>
+      {/* Gram Input */}
+      <div className='mb-4'>
+        <label className='form-label'>Serving Size (grams)</label>
+        <input
+          type='number'
+          className='form-control text-center'
+          value={grams}
+          onChange={(e) => setGrams(Math.max(0, e.target.valueAsNumber || 100))}
+          min='0'
+          max='10000'
+          step='1'
+          style={{ maxWidth: "200px", margin: "0 auto" }}
+        />
+      </div>
+
       <div
-        className='position-relative mx-auto mb-3'
-        style={{ width: "200px", height: "200px" }}
+        className='position-relative mx-auto mb-2'
+        style={{ width: "var(--circle-width)", height: "var(--circle-height)" }}
       >
-        <svg width='200' height='200' viewBox='0 0 200 200'>
+        <svg
+          width='var(--circle-width)'
+          height='var(--circle-height)'
+          viewBox='0 0 200 200'
+        >
           {nonZeroData.map((item, index) => {
-            const segmentLength = (item.value / total) * circumference;
+            const segmentLength =
+              (item.scaledValue / totalGrams) * circumference;
             const dashArray = `${segmentLength - gapSize} ${
               circumference - segmentLength + gapSize
             }`;
@@ -42,14 +84,14 @@ const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
         </svg>
 
         <div className='position-absolute top-50 start-50 translate-middle text-center'>
-          <div className='fs-5 fw-bold'>Total</div>
+          <div className='fontcustom fw-bold'>
+            {totalCalories.toFixed(0)} kcal
+          </div>
         </div>
       </div>
 
-      {/* Legend with percentages */}
       <div className='row justify-content-center'>
-        {data.map((item, index) => {
-          const percentage = ((item.value / (total || 1)) * 100).toFixed(1);
+        {scaledData.map((item, index) => {
           return (
             <div key={index} className='col-auto mb-2'>
               <div className='d-flex align-items-center'>
@@ -60,13 +102,14 @@ const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
                     height: "20px",
                     backgroundColor: item.color,
                     borderRadius: "4px",
-                    opacity: item.value > 0 ? 1 : 0.5,
+                    opacity: item.scaledValue > 0 ? 1 : 0.5,
                   }}
                 ></div>
-                <span>
-                  {item.label} ({item.value}g)
-                  <span className='text-muted ms-1'>{percentage}%</span>
-                </span>
+                <div>
+                  <div className='small mb-0'>
+                    {item.label}: {item.scaledValue.toFixed(1)}g
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -75,4 +118,5 @@ const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
     </div>
   );
 };
+
 export default CircleChart;

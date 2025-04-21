@@ -88,6 +88,12 @@ const Registration = () => {
                   placeholder=' '
                 />
 
+                <Form.Check
+                  type='checkbox'
+                  label='Remember Me?'
+                  className='my-2 fs-7'
+                />
+
                 <Col
                   md={6}
                   lg={5}

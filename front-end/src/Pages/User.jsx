@@ -1,7 +1,11 @@
 import React from "react";
-
+import Standard from "../Components/Users/Standard";
 const User = () => {
-  return <div></div>;
+  return (
+    <>
+      <Standard />
+    </>
+  );
 };
 
 export default User;

@@ -18,7 +18,6 @@ const Home = () => {
       <section id='Home'>
         <HomeSec />
       </section>
-      <hr />
       <section id='About'>
         <AboutSec />
       </section>
