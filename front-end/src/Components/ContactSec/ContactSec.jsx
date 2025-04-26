@@ -82,11 +82,9 @@ const ContactSection = () => {
                       Headquarters
                     </h5>
                     <p className='mb-0' style={{ color: "white" }}>
-                      123 Nutrition Lane
+                      Main Road
                       <br />
-                      Food Science Park
-                      <br />
-                      Boston, MA 02134
+                      Baalbeck, Lebanon
                     </p>
                   </div>
                 </div>
@@ -100,7 +98,7 @@ const ContactSection = () => {
                   ></i>
                   <div>
                     <h5 style={{ color: "var(--color-secondary)" }}>
-                      Phone Support
+                      Customer Support
                     </h5>
                     <p className='mb-0' style={{ color: "white" }}>
                       +961 76 469 435
@@ -121,7 +119,7 @@ const ContactSection = () => {
                     <p className='mb-0' style={{ color: "white" }}>
                       hassanein.sharafaldein.dev@gmail.com
                       <br />
-                      data@nutritiondb.com
+                      82130341@students.liu.edu.lb
                     </p>
                   </div>
                 </div>
@@ -131,13 +129,13 @@ const ContactSection = () => {
         </Row>
 
         {/* Copyright */}
-        <Row style={{ marginTop: "10vh" }}>
+        <Row>
           <Col className='text-center '>
             <p style={{ color: "whitesmoke", fontWeight: "bold" }}>
               &copy; {new Date().getFullYear()} NutritionDB. All rights
               reserved.
               <br />
-              Serving 10,000+ ingredient profiles to 500K+ monthly users
+              Serving 400K+ ingredient profiles to 500K+ monthly users
             </p>
           </Col>
         </Row>

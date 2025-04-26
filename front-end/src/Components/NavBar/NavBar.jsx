@@ -75,9 +75,9 @@ const NavBar = () => (
               as={Link}
               to='/SignUp'
               className={`button`}
-              style={{ fontSize: "10px" }}
+              style={{ whiteSpace: "nowrap" }}
             >
-              SignIn
+              Sign In
             </Button>
           </Col>
           <Col className='d-flex justify-content-center align-items-center'>

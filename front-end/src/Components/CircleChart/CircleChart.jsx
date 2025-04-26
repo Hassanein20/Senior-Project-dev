@@ -1,11 +1,16 @@
-import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Row, Col } from "react-bootstrap";
 
-const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
-  const [grams, setGrams] = useState(100);
+const CircleChart = ({
+  data,
+  thickness = 12,
+  gapSize = 4,
+  grams,
+  onGramsChange,
+}) => {
   const scaledData = data.map((item) => ({
     ...item,
-    scaledValue: item.value * (grams / 100),
+    scaledValue: (item.value * grams) / 100,
   }));
 
   // Filter and calculate totals
@@ -39,9 +44,10 @@ const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
           type='number'
           className='form-control text-center'
           value={grams}
-          onChange={(e) => setGrams(Math.max(0, e.target.valueAsNumber || 100))}
+          onChange={(e) =>
+            onGramsChange(Math.max(0, e.target.valueAsNumber || 100))
+          }
           min='0'
-          max='10000'
           step='1'
           style={{ maxWidth: "200px", margin: "0 auto" }}
         />
@@ -90,10 +96,10 @@ const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
         </div>
       </div>
 
-      <div className='row justify-content-center'>
+      <Row className=' justify-content-center'>
         {scaledData.map((item, index) => {
           return (
-            <div key={index} className='col-auto mb-2'>
+            <Col key={index} className='col-auto mb-2'>
               <div className='d-flex align-items-center'>
                 <div
                   className='color-box me-2'
@@ -111,10 +117,10 @@ const CircleChart = ({ data, thickness = 12, gapSize = 4 }) => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Col>
           );
         })}
-      </div>
+      </Row>
     </div>
   );
 };
