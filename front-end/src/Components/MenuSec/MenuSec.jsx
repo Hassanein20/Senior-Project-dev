@@ -39,7 +39,13 @@ const MenuSec = () => {
             }}
           >
             <h6 style={{ color: "var(--color-primary)" }}>Dry Pasta</h6>
-            <CircleChart data={chartData} thickness={5} gapSize={8} />
+            <CircleChart
+              data={chartData}
+              thickness={5}
+              gapSize={8}
+              grams={100}
+              onGramsChange={100}
+            />
           </Card>
         </Col>
         <Col>

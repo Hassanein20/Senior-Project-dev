@@ -1,14 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Card, Button, Form, Row, Col } from "react-bootstrap";
+import {
+  Container,
+  Card,
+  Button,
+  Form,
+  Row,
+  Col,
+  Modal,
+} from "react-bootstrap";
 import { FormInput } from "../Components/Registration/FormInput";
 import { RadioGroup } from "../Components/Registration/RadioGroup";
 import { DatePicker } from "../Components/Registration/DatePicker";
 import Background from "./../Assets/GettingInfo.webp";
+import {
+  emailSchema,
+  passwordSchema,
+} from "../Components/Registration/Validators";
 
 const GettingInfo = () => {
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
+    email: "",
+    password: "",
     fullName: "",
     date: { day: "", month: "", year: "" },
     weight: "",
@@ -17,7 +32,12 @@ const GettingInfo = () => {
     activityLevel: 0,
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    fullName: "",
+    date: "",
+  });
 
   const activityLevels = [
     "Sedentary: No or little exercise",
@@ -40,7 +60,29 @@ const GettingInfo = () => {
     setErrors((prev) => ({ ...prev, date: "" }));
   };
 
-  const validateForm = () => {
+  const validateCredentials = () => {
+    const newErrors = { email: "", password: "" };
+    let isValid = true;
+
+    try {
+      emailSchema.parse(formData.email);
+    } catch (error) {
+      newErrors.email = error.errors[0].message;
+      isValid = false;
+    }
+
+    try {
+      passwordSchema.parse(formData.password);
+    } catch (error) {
+      newErrors.password = error.errors[0].message;
+      isValid = false;
+    }
+
+    setErrors((prev) => ({ ...prev, ...newErrors }));
+    return isValid;
+  };
+
+  const validateUserInfo = () => {
     const newErrors = {};
 
     if (!formData.fullName.trim()) {
@@ -53,20 +95,22 @@ const GettingInfo = () => {
       newErrors.date = "Please select complete birthdate";
     }
 
+    setErrors((prev) => ({ ...prev, ...newErrors }));
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleCredentialSubmit = (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (validateCredentials()) {
+      setStep(2);
+    }
+  };
 
-    // const birthDate = new Date(
-    //   formData.date.year,
-    //   formData.date.month - 1,
-    //   formData.date.day
-    // );
-
-    navigate("/User", { state: formData });
+  const handleFinalSubmit = (e) => {
+    e.preventDefault();
+    if (validateUserInfo()) {
+      navigate("/User", { state: formData });
+    }
   };
 
   return (
@@ -74,91 +118,144 @@ const GettingInfo = () => {
       className='GettingInfoContainer d-flex align-items-center'
       style={{ backgroundImage: `url(${Background})` }}
     >
-      <Container>
-        <Row className='justify-content-center'>
-          <Col md={8} lg={6}>
-            <Card
-              className='p-4 form-shadow'
-              style={{ backgroundColor: "var(--color-card)" }}
-            >
-              <Form onSubmit={handleSubmit}>
-                <FormInput
-                  label='Full Name'
-                  name='fullName'
-                  value={formData.fullName}
-                  error={errors.fullName}
-                  onChange={(e) => handleChange("fullName", e.target.value)}
-                  autoFocus
-                  required
-                  placeholder=''
-                />
+      {step === 1 && (
+        <Modal
+          show
+          onHide={() => navigate(-1)}
+          backdrop='static'
+          keyboard={false}
+          centered
+        >
+          <Form onSubmit={handleCredentialSubmit}>
+            <Modal.Header className='d-flex justify-content-center align-items-center'>
+              <Modal.Title>Create a New Account</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <FormInput
+                label='Email'
+                type='email'
+                name='email'
+                value={formData.email}
+                error={errors.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                placeholder=' '
+              />
 
-                <DatePicker
-                  date={formData.date}
-                  error={errors.date}
-                  onDateChange={handleDateChange}
-                />
+              <FormInput
+                label='Password'
+                type='password'
+                name='password'
+                value={formData.password}
+                error={errors.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                placeholder=' '
+              />
 
-                <Row className='mb-3'>
-                  {["weight", "height"].map((field) => (
-                    <Col key={field} md={6}>
-                      <FormInput
-                        label={`${
-                          field.charAt(0).toUpperCase() + field.slice(1)
-                        } (${field === "weight" ? "kg" : "cm"})`}
-                        type='number'
-                        name={field}
-                        value={formData[field]}
-                        onChange={(e) => handleChange(field, e.target.value)}
-                        min={field === "weight" ? 40 : 100}
-                        max={field === "weight" ? 200 : 300}
-                        step='0.1'
-                        required
-                        placeholder=''
-                      />
-                    </Col>
-                  ))}
-                </Row>
+              <Form.Check
+                type='checkbox'
+                label='Remember Me?'
+                className='my-2 fs-7'
+              />
+            </Modal.Body>
+            <Modal.Footer className='d-flex justify-content-center align-items-center'>
+              <Button className='button' type='submit'>
+                Next
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      )}
 
-                <RadioGroup
-                  className={"d-flex flex-column align-items-center"}
-                  label='Gender'
-                  name='gender'
-                  options={[
-                    { label: "Male", value: "Male" },
-                    { label: "Female", value: "Female" },
-                  ]}
-                  value={formData.gender}
-                  onChange={(e) => handleChange("gender", e.target.value)}
-                />
-
-                <Form.Group className='mb-4'>
-                  <Form.Label
-                    style={{ color: "var(--color-text)", fontWeight: "bolder" }}
-                  >
-                    Activity Level: {activityLevels[formData.activityLevel]}
-                  </Form.Label>
-                  <Form.Range
-                    className='custom-range ActivityLevel'
-                    onChange={(e) => {
-                      handleChange("activityLevel", e.target.value);
-                    }}
-                    min='0'
-                    max='4'
-                    defaultValue='0'
+      {step === 2 && (
+        <Container>
+          <Row className='justify-content-center'>
+            <Col md={8} lg={6}>
+              <Card
+                className='p-4 form-shadow'
+                style={{ backgroundColor: "var(--color-card)" }}
+              >
+                <Form onSubmit={handleFinalSubmit}>
+                  <FormInput
+                    label='Full Name'
+                    name='fullName'
+                    value={formData.fullName}
+                    error={errors.fullName}
+                    onChange={(e) => handleChange("fullName", e.target.value)}
+                    autoFocus
+                    required
+                    placeholder=''
                   />
-                </Form.Group>
 
-                <div className='d-grid'>
-                  <Button className='button' type='submit'>
-                    Next
-                  </Button>
-                </div>
-              </Form>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+                  <DatePicker
+                    date={formData.date}
+                    error={errors.date}
+                    onDateChange={handleDateChange}
+                  />
+
+                  <Row className='mb-3'>
+                    {["weight", "height"].map((field) => (
+                      <Col key={field} md={6}>
+                        <FormInput
+                          label={`${
+                            field.charAt(0).toUpperCase() + field.slice(1)
+                          } (${field === "weight" ? "kg" : "cm"})`}
+                          type='number'
+                          name={field}
+                          value={formData[field]}
+                          onChange={(e) => handleChange(field, e.target.value)}
+                          min={field === "weight" ? 40 : 100}
+                          max={field === "weight" ? 200 : 300}
+                          step='0.1'
+                          required
+                          placeholder=''
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+
+                  <RadioGroup
+                    className={"d-flex flex-column align-items-center"}
+                    label='Gender'
+                    name='gender'
+                    options={[
+                      { label: "Male", value: "Male" },
+                      { label: "Female", value: "Female" },
+                    ]}
+                    value={formData.gender}
+                    onChange={(e) => handleChange("gender", e.target.value)}
+                  />
+
+                  <Form.Group className='mb-4'>
+                    <Form.Label
+                      style={{
+                        color: "var(--color-text)",
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      Activity Level: {activityLevels[formData.activityLevel]}
+                    </Form.Label>
+                    <Form.Range
+                      className='custom-range ActivityLevel'
+                      onChange={(e) => {
+                        handleChange("activityLevel", e.target.value);
+                      }}
+                      min='0'
+                      max='4'
+                      value={formData.activityLevel}
+                    />
+                  </Form.Group>
+
+                  <div className='d-grid'>
+                    <Button className='button' type='submit'>
+                      Next
+                    </Button>
+                  </div>
+                </Form>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      )}
     </div>
   );
 };

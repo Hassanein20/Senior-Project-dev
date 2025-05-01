@@ -73,7 +73,7 @@ const NavBar = () => (
           <Col className='d-flex justify-content-center align-items-center'>
             <Button
               as={Link}
-              to='/SignUp'
+              to='/SignIn'
               className={`button`}
               style={{ whiteSpace: "nowrap" }}
             >
