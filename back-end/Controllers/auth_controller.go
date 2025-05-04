@@ -1,4 +1,4 @@
-package controllers
+package Controllers
 
 import (
 	config "HabitBite/backend/Config"
@@ -112,9 +112,18 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("auth_token", tokenString, 3600*24, "/", ac.config.CookieDomain, false, true)
+	c.SetSameSite(http.SameSiteStrictMode)
+	c.SetCookie(
+		"auth_token",
+		tokenString,
+		3600*24,
+		"/",
+		ac.config.CookieDomain,
+		true, // Secure flag
+		true, // HttpOnly flag
+	)
 
+	user.PasswordHash = ""
 	c.JSON(http.StatusOK, gin.H{
 		"user":  user,
 		"token": tokenString,

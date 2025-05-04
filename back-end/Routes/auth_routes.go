@@ -1,7 +1,7 @@
 package routes
 
 import (
-	controllers "HabitBite/backend/Controllers"
+	controllers "HabitBite/backend/controllers"
 
 	"github.com/gin-gonic/gin"
 )

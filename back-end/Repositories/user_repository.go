@@ -4,6 +4,7 @@ import (
 	models "HabitBite/backend/Models"
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -39,7 +40,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*models
 	query := `SELECT * FROM users WHERE email = ? LIMIT 1`
 	var user models.User
 	err := r.db.GetContext(ctx, &user, query, email)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	return &user, err

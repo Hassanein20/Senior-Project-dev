@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 )
@@ -17,16 +18,26 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	port, _ := strconv.Atoi(os.Getenv("DB_PORT"))
+	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid DB_PORT: %v", err)
+	}
 
 	return &Config{
-		DBHost:       os.Getenv("DB_HOST"),
+		DBHost:       getEnv("DB_HOST", "localhost"),
 		DBPort:       port,
-		DBUser:       os.Getenv("DB_USER"),
-		DBPassword:   os.Getenv("DB_PASS"),
-		DBName:       os.Getenv("DB_NAME"),
-		JWTSecret:    os.Getenv("JWT_SECRET"),
-		CookieDomain: os.Getenv("COOKIE_DOMAIN"),
-		ServerPort:   os.Getenv("APP_PORT"),
+		DBUser:       getEnv("DB_USER", "root"),
+		DBPassword:   getEnv("DB_PASS", ""),
+		DBName:       getEnv("DB_NAME", "calorie_tracker"),
+		JWTSecret:    getEnv("JWT_SECRET", "default-secret"),
+		CookieDomain: getEnv("COOKIE_DOMAIN", "localhost"),
+		ServerPort:   getEnv("APP_PORT", "8080"),
 	}, nil
+}
+
+func getEnv(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }
