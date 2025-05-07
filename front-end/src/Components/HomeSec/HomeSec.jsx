@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Container, Row } from "react-bootstrap";
 import style from "./HomeSec.module.css";
 import { Link } from "react-router-dom";
+
 const HomeSec = () => {
   return (
     <>
@@ -21,16 +22,15 @@ const HomeSec = () => {
             <h6
               style={{
                 color: "var(--color-primary)",
-                textShadow: "0px 5px 5px black",
               }}
             >
               Your Journey to Better Health Starts Here
             </h6>
             <h2
               style={{
-                textShadow: "0px 5px 5px black",
                 color: "var(--color-secondary)",
                 padding: "2vh",
+                fontFamily: "DM Serif Display, serif",
               }}
             >
               Track Smarter. Eat Better. Acheive Your Goals.
@@ -38,7 +38,6 @@ const HomeSec = () => {
             <p
               style={{
                 color: "var(--color-white)",
-                textShadow: "0px 5px 5px black",
                 paddingLeft: "2vw",
               }}
             >

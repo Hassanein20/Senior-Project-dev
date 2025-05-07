@@ -38,10 +38,10 @@ const NavBar = () => (
             margin: "0",
             fontWeight: "600",
             color: "white",
-            fontFamily: "Inter, sans-serif",
+            fontFamily: "DM Serif Display, serif",
           }}
         >
-          NutriSync
+          HabitBite
         </p>
       </Navbar.Brand>
 

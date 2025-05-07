@@ -1,43 +1,134 @@
 package config
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"strconv"
+	"time"
 )
 
+// Config holds all configuration parameters for the application
 type Config struct {
-	DBHost       string
-	DBPort       int
-	DBUser       string
-	DBPassword   string
-	DBName       string
-	JWTSecret    string
-	CookieDomain string
-	ServerPort   string
+	// Database
+	DBHost     string
+	DBPort     int
+	DBUser     string
+	DBPassword string
+	DBName     string
+
+	// Authentication and security
+	JWTSecret      string
+	JWTExpiryHours int
+	CookieDomain   string
+
+	// Server
+	ServerPort         string
+	CORSAllowedOrigins []string
+
+	// Environment
+	Environment string // "development", "testing", or "production"
 }
 
+// LoadConfig loads configuration from environment variables
 func LoadConfig() (*Config, error) {
-	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
-	if err != nil {
-		return nil, fmt.Errorf("invalid DB_PORT: %v", err)
+	// Default configuration for local development
+	config := &Config{
+		// Database (XAMPP defaults)
+		DBHost:     "localhost",
+		DBPort:     3306,
+		DBUser:     "root",
+		DBPassword: "", // XAMPP default has no password
+		DBName:     "habitbite",
+
+		// Authentication and security
+		JWTSecret:      "your_development_secret_key", // Change this in production
+		JWTExpiryHours: 24,
+		CookieDomain:   "localhost",
+
+		// Server
+		ServerPort:         "8080",
+		CORSAllowedOrigins: []string{"http://localhost:3000", "http://localhost:5173"},
+
+		// Environment
+		Environment: "development",
 	}
 
-	return &Config{
-		DBHost:       getEnv("DB_HOST", "localhost"),
-		DBPort:       port,
-		DBUser:       getEnv("DB_USER", "root"),
-		DBPassword:   getEnv("DB_PASS", ""),
-		DBName:       getEnv("DB_NAME", "calorie_tracker"),
-		JWTSecret:    getEnv("JWT_SECRET", "default-secret"),
-		CookieDomain: getEnv("COOKIE_DOMAIN", "localhost"),
-		ServerPort:   getEnv("APP_PORT", "8080"),
-	}, nil
+	// Override with environment variables if they exist
+	if port := os.Getenv("DB_PORT"); port != "" {
+		if p, err := strconv.Atoi(port); err == nil {
+			config.DBPort = p
+		}
+	}
+	if host := os.Getenv("DB_HOST"); host != "" {
+		config.DBHost = host
+	}
+	if user := os.Getenv("DB_USER"); user != "" {
+		config.DBUser = user
+	}
+	if pass := os.Getenv("DB_PASS"); pass != "" {
+		config.DBPassword = pass
+	}
+	if name := os.Getenv("DB_NAME"); name != "" {
+		config.DBName = name
+	}
+	if secret := os.Getenv("JWT_SECRET"); secret != "" {
+		config.JWTSecret = secret
+	}
+	if port := os.Getenv("APP_PORT"); port != "" {
+		config.ServerPort = port
+	}
+	if env := os.Getenv("APP_ENV"); env != "" {
+		config.Environment = env
+	}
+
+	return config, nil
 }
 
+// JWTExpiryDuration returns the JWT expiry duration
+func (c *Config) JWTExpiryDuration() time.Duration {
+	return time.Duration(c.JWTExpiryHours) * time.Hour
+}
+
+// IsDevelopment returns true if the application is running in development mode
+func (c *Config) IsDevelopment() bool {
+	return c.Environment == "development"
+}
+
+// IsProduction returns true if the application is running in production mode
+func (c *Config) IsProduction() bool {
+	return c.Environment == "production"
+}
+
+// Validate checks if the configuration is valid
+func (c *Config) Validate() error {
+	if c.JWTSecret == "" {
+		return errors.New("JWT_SECRET is required")
+	}
+
+	if c.JWTExpiryHours <= 0 {
+		return errors.New("JWT_EXPIRY_HOURS must be positive")
+	}
+
+	return nil
+}
+
+// getEnv gets an environment variable or returns a default value
 func getEnv(key, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
+	if value, exists := os.LookupEnv(key); exists && value != "" {
 		return value
 	}
 	return defaultValue
+}
+
+// checkRequiredEnvVars checks if required environment variables are set
+func checkRequiredEnvVars(requiredVars []string) []string {
+	var missingVars []string
+
+	for _, envVar := range requiredVars {
+		if os.Getenv(envVar) == "" {
+			missingVars = append(missingVars, envVar)
+		}
+	}
+
+	return missingVars
 }

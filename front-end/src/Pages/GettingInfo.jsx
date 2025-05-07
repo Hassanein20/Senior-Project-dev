@@ -17,9 +17,13 @@ import {
   emailSchema,
   passwordSchema,
 } from "../Components/Registration/Validators";
+import { useAuth } from "../Context/AuthContext";
 
 const GettingInfo = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     email: "",
@@ -28,8 +32,9 @@ const GettingInfo = () => {
     date: { day: "", month: "", year: "" },
     weight: "",
     height: "",
-    gender: "Male",
+    gender: "male",
     activityLevel: 0,
+    goal: 1, // 0: lose, 1: maintain, 2: gain
   });
 
   const [errors, setErrors] = useState({
@@ -46,6 +51,8 @@ const GettingInfo = () => {
     "Active: Sports 6-7 days/week",
     "Very Active: Training twice a day",
   ];
+
+  const goalLevels = ["Lose Weight", "Maintain Weight", "Gain Weight"];
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -106,10 +113,65 @@ const GettingInfo = () => {
     }
   };
 
-  const handleFinalSubmit = (e) => {
+  const handleFinalSubmit = async (e) => {
     e.preventDefault();
     if (validateUserInfo()) {
-      navigate("/User", { state: formData });
+      setError("");
+      setLoading(true);
+
+      try {
+        // Convert goal value to the format expected by the backend
+        const goalMap = {
+          0: "lose",
+          1: "maintain",
+          2: "gain",
+        };
+
+        // Convert activity level to the format expected by the backend
+        const activityMap = {
+          0: "sedentary",
+          1: "light",
+          2: "moderate",
+          3: "active",
+          4: "very_active",
+        };
+
+        // Format the date
+        const birthdate = `${formData.date.year}-${String(
+          formData.date.month
+        ).padStart(2, "0")}-${String(formData.date.day).padStart(2, "0")}`;
+
+        const formattedData = {
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+          birthdate: birthdate,
+          gender: formData.gender.toLowerCase(),
+          height: parseFloat(formData.height),
+          weight: parseFloat(formData.weight),
+          goalType: goalMap[formData.goal],
+          activityLevel: activityMap[formData.activityLevel],
+        };
+
+        // Make the registration request
+        await register(formattedData);
+        navigate("/User");
+      } catch (err) {
+        if (
+          err.response?.status === 403 &&
+          err.response?.data?.error === "CSRF token invalid"
+        ) {
+          setError("Session expired. Please refresh the page and try again.");
+        } else {
+          setError(
+            err.response?.data?.error ||
+              "Registration failed. Please try again."
+          );
+        }
+        console.error("Registration error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -131,6 +193,7 @@ const GettingInfo = () => {
               <Modal.Title>Create a New Account</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+              {error && <div className='alert alert-danger'>{error}</div>}
               <FormInput
                 label='Email'
                 type='email'
@@ -172,9 +235,24 @@ const GettingInfo = () => {
             <Col md={8} lg={6}>
               <Card
                 className='p-4 form-shadow'
-                style={{ backgroundColor: "var(--color-card)" }}
+                style={{
+                  backgroundColor: "var(--color-card)",
+                  maxHeight: "90vh",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
               >
+                <style>
+                  {`
+                    .form-shadow::-webkit-scrollbar {
+                      display: none;  /* Chrome, Safari and Opera */
+                    }
+                  `}
+                </style>
                 <Form onSubmit={handleFinalSubmit}>
+                  {error && <div className='alert alert-danger'>{error}</div>}
                   <FormInput
                     label='Full Name'
                     name='fullName'
@@ -218,8 +296,8 @@ const GettingInfo = () => {
                     label='Gender'
                     name='gender'
                     options={[
-                      { label: "Male", value: "Male" },
-                      { label: "Female", value: "Female" },
+                      { label: "Male", value: "male" },
+                      { label: "Female", value: "female" },
                     ]}
                     value={formData.gender}
                     onChange={(e) => handleChange("gender", e.target.value)}
@@ -245,9 +323,29 @@ const GettingInfo = () => {
                     />
                   </Form.Group>
 
+                  <Form.Group className='mb-4'>
+                    <Form.Label
+                      style={{
+                        color: "var(--color-text)",
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      Goal: {goalLevels[formData.goal]}
+                    </Form.Label>
+                    <Form.Range
+                      className='custom-range ActivityLevel'
+                      onChange={(e) => {
+                        handleChange("goal", e.target.value);
+                      }}
+                      min='0'
+                      max='2'
+                      value={formData.goal}
+                    />
+                  </Form.Group>
+
                   <div className='d-grid'>
-                    <Button className='button' type='submit'>
-                      Next
+                    <Button className='button' type='submit' disabled={loading}>
+                      {loading ? "Registering..." : "Register"}
                     </Button>
                   </div>
                 </Form>

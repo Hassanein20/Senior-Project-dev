@@ -8,6 +8,8 @@ import {
 } from "../Components/Registration/Validators";
 import Background from "../Assets/RegistrationBG.webp";
 import { Link } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
+
 const SignIn = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -45,11 +47,28 @@ const SignIn = () => {
     setErrors(validationResult);
     return !validationResult.email && !validationResult.password;
   };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      navigate("/User");
+    setError("");
+    setLoading(true);
+
+    try {
+      await login(email, password);
+      navigate("/User"); // Redirect to user dashboard after login
+    } catch (err) {
+      setError(
+        err.response?.data?.error ||
+          "Failed to sign in. Please check your credentials."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,6 +86,7 @@ const SignIn = () => {
                 style={{ backgroundColor: "var(--color-card)" }}
               >
                 <Form onSubmit={handleSubmit}>
+                  {error && <div className='alert alert-danger'>{error}</div>}
                   <h3 className='text-center mb-4'>Sign In</h3>
 
                   <FormInput
@@ -117,8 +137,12 @@ const SignIn = () => {
                   </Col>
 
                   <div className='d-grid'>
-                    <Button type='submit' className='mt-4 button'>
-                      Next
+                    <Button
+                      type='submit'
+                      className='mt-4 button'
+                      disabled={loading}
+                    >
+                      {loading ? "Signing In..." : "Sign In"}
                     </Button>
                   </div>
                 </Form>

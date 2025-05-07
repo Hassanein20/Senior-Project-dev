@@ -1,4 +1,5 @@
 import { FloatingLabel, Form } from "react-bootstrap";
+import { PasswordInput } from "./PasswordInput";
 
 export const FormInput = ({
   label,
@@ -8,24 +9,41 @@ export const FormInput = ({
   error,
   onChange,
   ...props
-}) => (
-  <FloatingLabel
-    label={label}
-    style={{ color: "var(--color-text)" }}
-    data-bs-theme='var(--color-theme)'
-    className='mb-3'
-  >
-    <Form.Control
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-      isInvalid={!!error}
-      style={{
-        backgroundColor: "var(--color-lighter)",
-      }}
-      {...props}
-    />
-    <Form.Control.Feedback type='invalid'>{error}</Form.Control.Feedback>
-  </FloatingLabel>
-);
+}) => {
+  // Use PasswordInput for password fields
+  if (type === "password") {
+    return (
+      <PasswordInput
+        label={label}
+        name={name}
+        value={value}
+        error={error}
+        onChange={onChange}
+        {...props}
+      />
+    );
+  }
+
+  // Regular input for other types
+  return (
+    <FloatingLabel
+      label={label}
+      style={{ color: "var(--color-text)" }}
+      data-bs-theme='var(--color-theme)'
+      className='mb-3'
+    >
+      <Form.Control
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        isInvalid={!!error}
+        style={{
+          backgroundColor: "var(--color-lighter)",
+        }}
+        {...props}
+      />
+      <Form.Control.Feedback type='invalid'>{error}</Form.Control.Feedback>
+    </FloatingLabel>
+  );
+};
