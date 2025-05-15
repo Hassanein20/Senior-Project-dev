@@ -47,6 +47,7 @@ func CreateSchema(db *sqlx.DB) error {
 		weight DECIMAL(5,2) NOT NULL,
 		goal_type VARCHAR(50) NOT NULL,
 		activity_level VARCHAR(50) NOT NULL,
+		daily_calorie_goal INT NOT NULL DEFAULT 2000,
 		role VARCHAR(20) NOT NULL DEFAULT 'user',
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -55,13 +55,9 @@ const CircleChart = ({
 
       <div
         className='position-relative mx-auto mb-2'
-        style={{ width: "var(--circle-width)", height: "var(--circle-height)" }}
+        style={{ width: "200px", height: "200px" }}
       >
-        <svg
-          width='var(--circle-width)'
-          height='var(--circle-height)'
-          viewBox='0 0 200 200'
-        >
+        <svg width='200' height='200' viewBox='0 0 200 200'>
           {nonZeroData.map((item, index) => {
             const segmentLength =
               (item.scaledValue / totalGrams) * circumference;

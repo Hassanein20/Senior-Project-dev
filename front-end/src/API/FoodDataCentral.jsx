@@ -10,9 +10,7 @@ export const searchFoods = async (query) => {
         api_key: API_KEY,
         query: query,
         pageSize: 10,
-        dataType: ["Survey (FNDDS)", "Foundation", "Branded"],
-        sortBy: "publishedDate",
-        sortOrder: "desc",
+        dataType: ["Foundation", "Survey (FNDDS)", "Branded"],
       },
       paramsSerializer: (params) => {
         return new URLSearchParams(params)

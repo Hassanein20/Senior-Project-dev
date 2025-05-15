@@ -59,7 +59,7 @@ const ServicesSec = () => {
             style={{ color: "var(--color-light)" }}
           >
             Track daily calories, micronutrients, and weight trends with
-            interactive graphs. Export reports to share with your dietitian.
+            interactive graphs.
           </p>
         </Row>
         <Row className='justify-content-end'>
@@ -67,8 +67,7 @@ const ServicesSec = () => {
             className={`${style.Content}`}
             style={{ color: "var(--color-light)" }}
           >
-            Log meals in seconds with our 10,000+ food database. Scan barcodes
-            for instant macros—no more guesswork!
+            Log meals in seconds with our 40,000+ food API. No more guesswork!
           </p>
         </Row>
       </Container>

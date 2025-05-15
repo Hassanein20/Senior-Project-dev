@@ -65,13 +65,13 @@ func (r *userRepository) CreateUser(ctx context.Context, user *models.User) erro
 
 	query := `INSERT INTO users (
         email, username, password_hash, full_name, birthdate, gender, 
-        height, weight, goal_type, activity_level, role, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        height, weight, goal_type, activity_level, daily_calorie_goal, role, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	result, err := r.db.ExecContext(ctx, query,
 		user.Email, user.Username, user.PasswordHash, user.FullName,
 		user.Birthdate, user.Gender, user.Height, user.Weight,
-		user.GoalType, user.ActivityLevel, user.Role, user.CreatedAt, user.UpdatedAt)
+		user.GoalType, user.ActivityLevel, user.DailyCalorieGoal, user.Role, user.CreatedAt, user.UpdatedAt)
 
 	if err != nil {
 		return wrapDatabaseError(err)
@@ -141,13 +141,13 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *models.User) erro
 	query := `UPDATE users SET 
 		email = ?, username = ?, password_hash = ?, full_name = ?, 
 		birthdate = ?, gender = ?, height = ?, weight = ?, 
-		goal_type = ?, activity_level = ?, role = ?, updated_at = ?
+		goal_type = ?, activity_level = ?, daily_calorie_goal = ?, role = ?, updated_at = ?
 		WHERE id = ?`
 
 	result, err := r.db.ExecContext(ctx, query,
 		user.Email, user.Username, user.PasswordHash, user.FullName,
 		user.Birthdate, user.Gender, user.Height, user.Weight,
-		user.GoalType, user.ActivityLevel, user.Role, user.UpdatedAt,
+		user.GoalType, user.ActivityLevel, user.DailyCalorieGoal, user.Role, user.UpdatedAt,
 		user.ID)
 
 	if err != nil {

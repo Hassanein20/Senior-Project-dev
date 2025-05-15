@@ -28,6 +28,7 @@ const GettingInfo = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    username: "",
     fullName: "",
     date: { day: "", month: "", year: "" },
     weight: "",
@@ -40,6 +41,7 @@ const GettingInfo = () => {
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+    username: "",
     fullName: "",
     date: "",
   });
@@ -68,7 +70,7 @@ const GettingInfo = () => {
   };
 
   const validateCredentials = () => {
-    const newErrors = { email: "", password: "" };
+    const newErrors = { email: "", password: "", username: "" };
     let isValid = true;
 
     try {
@@ -82,6 +84,15 @@ const GettingInfo = () => {
       passwordSchema.parse(formData.password);
     } catch (error) {
       newErrors.password = error.errors[0].message;
+      isValid = false;
+    }
+
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+      isValid = false;
+    } else if (!/^[a-zA-Z0-9]{3,50}$/.test(formData.username)) {
+      newErrors.username =
+        "Username must be 3-50 characters and contain only letters and numbers";
       isValid = false;
     }
 
@@ -144,6 +155,7 @@ const GettingInfo = () => {
         const formattedData = {
           email: formData.email,
           password: formData.password,
+          username: formData.username,
           fullName: formData.fullName,
           birthdate: birthdate,
           gender: formData.gender.toLowerCase(),
@@ -154,21 +166,33 @@ const GettingInfo = () => {
         };
 
         // Make the registration request
-        await register(formattedData);
-        navigate("/User");
+        const response = await register(formattedData);
+
+        // Check if registration was successful
+        if (response && response.user) {
+          // Navigate to User page
+          navigate("/User", { replace: true });
+        } else {
+          throw new Error("Registration failed: No user data received");
+        }
       } catch (err) {
+        // Enhanced error logging
+        console.error("Registration error:", err);
+        console.error("Error response:", err.response?.data);
+
         if (
           err.response?.status === 403 &&
           err.response?.data?.error === "CSRF token invalid"
         ) {
           setError("Session expired. Please refresh the page and try again.");
         } else {
-          setError(
+          const errorMessage =
             err.response?.data?.error ||
-              "Registration failed. Please try again."
-          );
+            err.response?.data?.details ||
+            err.message ||
+            "Registration failed. Please try again.";
+          setError(errorMessage);
         }
-        console.error("Registration error:", err);
       } finally {
         setLoading(false);
       }
@@ -201,6 +225,16 @@ const GettingInfo = () => {
                 value={formData.email}
                 error={errors.email}
                 onChange={(e) => handleChange("email", e.target.value)}
+                placeholder=' '
+              />
+
+              <FormInput
+                label='Username'
+                type='text'
+                name='username'
+                value={formData.username}
+                error={errors.username}
+                onChange={(e) => handleChange("username", e.target.value)}
                 placeholder=' '
               />
 

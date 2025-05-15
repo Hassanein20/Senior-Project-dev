@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type Config struct {
 	JWTSecret      string
 	JWTExpiryHours int
 	CookieDomain   string
+	CookieSecure   bool
 
 	// Server
 	ServerPort         string
@@ -44,6 +46,7 @@ func LoadConfig() (*Config, error) {
 		JWTSecret:      "your_development_secret_key", // Change this in production
 		JWTExpiryHours: 24,
 		CookieDomain:   "localhost",
+		CookieSecure:   false, // Set to false for development, true for production
 
 		// Server
 		ServerPort:         "8080",
@@ -80,6 +83,15 @@ func LoadConfig() (*Config, error) {
 	if env := os.Getenv("APP_ENV"); env != "" {
 		config.Environment = env
 	}
+	if secure := os.Getenv("COOKIE_SECURE"); secure != "" {
+		config.CookieSecure = secure == "true"
+	}
+	if domain := os.Getenv("COOKIE_DOMAIN"); domain != "" {
+		config.CookieDomain = domain
+	}
+	if origins := os.Getenv("CORS_ALLOWED_ORIGINS"); origins != "" {
+		config.CORSAllowedOrigins = strings.Split(origins, ",")
+	}
 
 	return config, nil
 }
@@ -110,25 +122,4 @@ func (c *Config) Validate() error {
 	}
 
 	return nil
-}
-
-// getEnv gets an environment variable or returns a default value
-func getEnv(key, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists && value != "" {
-		return value
-	}
-	return defaultValue
-}
-
-// checkRequiredEnvVars checks if required environment variables are set
-func checkRequiredEnvVars(requiredVars []string) []string {
-	var missingVars []string
-
-	for _, envVar := range requiredVars {
-		if os.Getenv(envVar) == "" {
-			missingVars = append(missingVars, envVar)
-		}
-	}
-
-	return missingVars
 }

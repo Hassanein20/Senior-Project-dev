@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strings"
@@ -30,6 +32,15 @@ func AuthMiddleware(cfg *config.Config) gin.HandlerFunc {
 			// Add claims to context
 			c.Set("userID", claims["sub"])
 			c.Set("userRole", claims["role"])
+
+			// Set CSRF token if not already set
+			if _, err := c.Cookie("csrf_token"); err != nil {
+				if err := SetCSRFToken(c); err != nil {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to set CSRF token"})
+					return
+				}
+			}
+
 			c.Next()
 		} else {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
@@ -62,40 +73,6 @@ func RoleMiddleware(allowedRoles ...string) gin.HandlerFunc {
 
 		c.AbortWithStatusJSON(http.StatusForbidden,
 			gin.H{"error": "Insufficient permissions for this resource"})
-	}
-}
-
-// CORSMiddleware handles Cross-Origin Resource Sharing
-func CORSMiddleware(allowedOrigins []string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		origin := c.Request.Header.Get("Origin")
-
-		// Check if origin is allowed
-		allowOrigin := false
-		for _, allowedOrigin := range allowedOrigins {
-			if allowedOrigin == "*" || allowedOrigin == origin {
-				allowOrigin = true
-				break
-			}
-		}
-
-		// If origin is allowed or in development mode, set CORS headers
-		if allowOrigin {
-			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
-			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-			c.Writer.Header().Set("Access-Control-Allow-Headers",
-				"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-			c.Writer.Header().Set("Access-Control-Allow-Methods",
-				"POST, OPTIONS, GET, PUT, DELETE, PATCH")
-		}
-
-		// Handle preflight requests
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-
-		c.Next()
 	}
 }
 
@@ -136,4 +113,34 @@ func validateToken(tokenString, secret string) (*jwt.Token, error) {
 	}
 
 	return token, nil
+}
+
+// SetCSRFToken sets a new CSRF token in the response cookie
+func SetCSRFToken(c *gin.Context) error {
+	// Generate a new token
+	token := GenerateCSRFToken()
+
+	// Set token in cookie
+	c.SetCookie(
+		"csrf_token",
+		token,
+		3600, // 1 hour
+		"/",
+		"",    // Empty domain for cross-origin compatibility
+		true,  // Secure
+		false, // Not HttpOnly, so JavaScript can access it
+	)
+
+	// Set token in header for frontend to store
+	c.Header("X-CSRF-Token", token)
+	return nil
+}
+
+// GenerateCSRFToken generates a new CSRF token
+func GenerateCSRFToken() string {
+	// Generate 32 random bytes
+	b := make([]byte, 32)
+	rand.Read(b)
+	// Encode to base64
+	return base64.StdEncoding.EncodeToString(b)
 }

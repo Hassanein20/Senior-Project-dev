@@ -20,6 +20,9 @@ const SignIn = () => {
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -47,22 +50,21 @@ const SignIn = () => {
     setErrors(validationResult);
     return !validationResult.email && !validationResult.password;
   };
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setError("");
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate("/User"); // Redirect to user dashboard after login
+      const user = await login(formData.email, formData.password);
+      if (user) {
+        navigate("/User");
+      }
     } catch (err) {
+      console.error("Login error:", err);
       setError(
         err.response?.data?.error ||
           "Failed to sign in. Please check your credentials."
@@ -136,15 +138,13 @@ const SignIn = () => {
                     </Nav.Link>
                   </Col>
 
-                  <div className='d-grid'>
-                    <Button
-                      type='submit'
-                      className='mt-4 button'
-                      disabled={loading}
-                    >
-                      {loading ? "Signing In..." : "Sign In"}
-                    </Button>
-                  </div>
+                  <Button
+                    type='submit'
+                    className='w-100 mt-3 button'
+                    disabled={loading}
+                  >
+                    {loading ? "Signing in..." : "Sign In"}
+                  </Button>
                 </Form>
               </Card>
             </Col>

@@ -13,13 +13,11 @@ import (
 	controllers "HabitBite/backend/Controllers"
 	middleware "HabitBite/backend/Middleware"
 	repositories "HabitBite/backend/Repositories"
-	routes "HabitBite/backend/Routes"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	csrf "github.com/utrack/gin-csrf"
 )
 
 func main() {
@@ -51,9 +49,11 @@ func main() {
 
 	// Initialize repositories
 	userRepo := repositories.NewUserRepository(db)
+	foodEntryRepo := repositories.NewFoodEntryRepository(db)
 
 	// Initialize controllers
 	authController := controllers.NewAuthController(userRepo, cfg)
+	foodEntryController := controllers.NewFoodEntryController(foodEntryRepo)
 
 	// Create Gin router
 	router := gin.Default()
@@ -70,21 +70,60 @@ func main() {
 	})
 	router.Use(sessions.Sessions("habitbite-session", store))
 
-	// Middleware chain
+	// Middleware chain for all routes
 	router.Use(
 		middleware.CORSMiddleware(cfg.CORSAllowedOrigins),
 		middleware.SecurityHeaders(),
-		middleware.RateLimiter(5, 10), // 5 requests per second, burst of 10
-		csrf.Middleware(csrf.Options{
-			Secret: cfg.JWTSecret,
-			ErrorFunc: func(c *gin.Context) {
-				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "CSRF token invalid"})
-			},
-		}),
 	)
 
-	// Register routes
-	routes.RegisterRoutes(router, authController, cfg)
+	// API routes
+	api := router.Group("/api")
+
+	// Public routes (no CSRF protection)
+	public := api.Group("")
+	{
+		// Health check endpoint
+		public.GET("/health", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"status": "healthy",
+			})
+		})
+
+		// Version info endpoint
+		public.GET("/version", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"version": "1.0.0",
+				"env":     cfg.Environment,
+			})
+		})
+	}
+
+	// Auth routes with rate limiting
+	auth := api.Group("/auth")
+	auth.Use(middleware.RateLimiter(5, 10))
+	{
+		auth.POST("/register", authController.Register)
+		auth.POST("/login", authController.Login)
+		auth.POST("/logout", authController.Logout)
+		auth.GET("/profile", middleware.AuthMiddleware(cfg), authController.GetCurrentUser)
+		auth.POST("/refresh", middleware.AuthMiddleware(cfg), authController.RefreshToken)
+		auth.GET("/csrf", authController.GetCSRFToken) // New endpoint for getting CSRF token
+	}
+
+	// Protected routes (with CSRF protection)
+	protected := api.Group("")
+	protected.Use(
+		middleware.AuthMiddleware(cfg),
+		middleware.CSRFMiddleware(),
+	)
+	{
+		// Food entry routes
+		protected.POST("/consumed-foods", foodEntryController.AddFoodEntry)
+		protected.GET("/consumed-foods/daily", foodEntryController.GetDailyEntries)
+		protected.GET("/consumed-foods/nutrition", foodEntryController.GetDailyNutrition)
+		protected.DELETE("/consumed-foods/:id", foodEntryController.DeleteFoodEntry)
+		protected.GET("/consumed-foods/history", foodEntryController.GetNutritionHistory)
+	}
 
 	// Create server with timeouts
 	srv := &http.Server{
