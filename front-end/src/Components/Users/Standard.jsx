@@ -40,8 +40,8 @@ const Standard = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [foodEntriesChanged, setFoodEntriesChanged] = useState(0);
 
-  const caloriesGoal = 4000; // This should come from user's profile
-  const caloriesLeft = caloriesGoal - dailyTotals.calories;
+  const caloriesGoal = currentUser?.calorieGoal || 2000; // Get from user profile, default to 2000 if not set
+  const caloriesLeft = Number((caloriesGoal - dailyTotals.calories).toFixed(2));
 
   // Fetch CSRF token on component mount
   useEffect(() => {
@@ -414,7 +414,7 @@ const Standard = () => {
       // Refresh weekly data
       await refreshNutritionDataWithRetry();
 
-      // Notify components that data has changed - use a unique value to force refresh
+      // Trigger a single graph refresh
       setFoodEntriesChanged(Date.now());
 
       return true;
@@ -478,14 +478,6 @@ const Standard = () => {
       if (response) {
         console.log("Server response after adding food entry:", response);
 
-        // Temporarily update local state for immediate UI feedback
-        setDailyTotals((prev) => ({
-          protein: Number((prev.protein + protein).toFixed(2)),
-          carbs: Number((prev.carbs + carbs).toFixed(2)),
-          fats: Number((prev.fats + fats).toFixed(2)),
-          calories: Number((prev.calories + calories).toFixed(2)),
-        }));
-
         // Extract timestamp from server response if available
         const entryTime = response.entry_date || response.date || fullISODate;
         const timestamp = new Date(entryTime).toLocaleTimeString([], {
@@ -493,6 +485,7 @@ const Standard = () => {
           minute: "2-digit",
         });
 
+        // Update local state with the new ingredient
         setAddedIngredients((prev) => [
           ...prev,
           {
@@ -507,15 +500,18 @@ const Standard = () => {
           },
         ]);
 
-        // Use a more reliable staggered refresh approach
-        console.log("Starting staged data refresh after adding ingredient");
-
-        // First increment the counter to notify graph components (quick update)
-        setFoodEntriesChanged(Date.now());
-
-        // Then do a complete data refresh with a delay to ensure backend has processed the data
+        // Refresh all data once after a slight delay to ensure backend processing is complete
         setTimeout(async () => {
-          await refreshTodayData();
+          const success = await refreshTodayData();
+          if (!success) {
+            // If refresh failed, at least update the totals locally for UI feedback
+            setDailyTotals((prev) => ({
+              protein: Number((prev.protein + protein).toFixed(2)),
+              carbs: Number((prev.carbs + carbs).toFixed(2)),
+              fats: Number((prev.fats + fats).toFixed(2)),
+              calories: Number((prev.calories + calories).toFixed(2)),
+            }));
+          }
         }, 500);
 
         // Close the modal after successful addition
@@ -529,31 +525,28 @@ const Standard = () => {
 
   const handleDeleteIngredient = async (id) => {
     try {
+      // Find the item to be deleted for local state updates
+      const itemToDelete = addedIngredients.find((item) => item.id === id);
+
       // Delete from backend
       await foodEntryAPI.deleteFoodEntry(id);
 
-      // Update local state
-      setAddedIngredients((prev) => {
-        const deleted = prev.find((item) => item.id === id);
-        if (!deleted) return prev;
+      // Update UI by removing the item
+      setAddedIngredients((prev) => prev.filter((item) => item.id !== id));
 
-        // Temporarily update totals for immediate UI feedback
-        setDailyTotals((prevTotals) => ({
-          protein: prevTotals.protein - deleted.protein,
-          carbs: prevTotals.carbs - deleted.carbs,
-          fats: prevTotals.fats - deleted.fat, // Use deleted.fat since that's how it's stored in the item
-          calories: prevTotals.calories - deleted.calories,
-        }));
-
-        // Use same staggered refresh as in handleAddIngredient
-        setFoodEntriesChanged(Date.now());
-
-        setTimeout(async () => {
-          await refreshTodayData();
-        }, 500);
-
-        return prev.filter((item) => item.id !== id);
-      });
+      // Refresh all data once after a slight delay to ensure backend processing is complete
+      setTimeout(async () => {
+        const success = await refreshTodayData();
+        if (!success && itemToDelete) {
+          // If refresh failed, at least update the totals locally for UI feedback
+          setDailyTotals((prevTotals) => ({
+            protein: Math.max(0, prevTotals.protein - itemToDelete.protein),
+            carbs: Math.max(0, prevTotals.carbs - itemToDelete.carbs),
+            fats: Math.max(0, prevTotals.fats - itemToDelete.fat),
+            calories: Math.max(0, prevTotals.calories - itemToDelete.calories),
+          }));
+        }
+      }, 500);
     } catch (err) {
       console.error("Error deleting food entry:", err);
       setError("Failed to delete food entry. Please try again.");
@@ -651,7 +644,9 @@ const Standard = () => {
         {renderError(error)}
         <Row>
           <Col>
-            <h2>Welcome, {currentUser?.username || "User"}</h2>
+            <h2 style={{ color: "var(--color-primary)" }}>
+              Welcome, {currentUser?.username || "User"}
+            </h2>
           </Col>
           <Col className='d-flex justify-content-end align-items-center gap-3'>
             <p style={{ fontWeight: "bold", margin: 0 }}>
@@ -721,7 +716,7 @@ const Standard = () => {
           <Card
             style={{ backgroundColor: "var(--color-card)", padding: "1rem" }}
           >
-            <h5>Added Ingredients</h5>
+            <h5 style={{ color: "var(--color-primary)" }}>Added Ingredients</h5>
             <div style={{ maxHeight: "300px", overflowY: "auto" }}>
               {addedIngredients.length > 0 ? (
                 addedIngredients.map((item) => (
