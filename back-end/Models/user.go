@@ -108,3 +108,13 @@ func (u *User) ToAuthUser() *AuthUser {
 		DailyCalorieGoal: u.DailyCalorieGoal,
 	}
 }
+
+// UserGoals represents a user's nutritional goals
+type UserGoals struct {
+	UserID         int     `db:"user_id" json:"userId"`
+	TargetCalories int     `db:"target_calories" json:"targetCalories"`
+	TargetProtein  float64 `db:"target_protein" json:"targetProtein"`
+	TargetCarbs    float64 `db:"target_carbs" json:"targetCarbs"`
+	TargetFats     float64 `db:"target_fats" json:"targetFats"`
+	TargetWeight   float64 `db:"target_weight" json:"targetWeight"`
+}

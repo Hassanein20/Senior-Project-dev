@@ -99,15 +99,25 @@ export const AuthProvider = ({ children }) => {
       console.log("Registration response:", response);
 
       if (response && response.user) {
+        console.log("Setting current user from registration:", response.user);
         setCurrentUser(response.user);
         localStorage.setItem("user", JSON.stringify(response.user));
-        return response.user;
+
+        // Ensure token is stored if it's in the response
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+        }
+
+        return response;
       } else {
+        console.error("Invalid registration response structure:", response);
         throw new Error("Invalid registration response");
       }
     } catch (err) {
       console.error("Registration error:", err);
-      setError(err.response?.data?.error || "Registration failed");
+      setError(
+        err.response?.data?.error || err.message || "Registration failed"
+      );
       throw err;
     }
   };

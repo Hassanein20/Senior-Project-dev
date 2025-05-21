@@ -166,13 +166,19 @@ const GettingInfo = () => {
         };
 
         // Make the registration request
+        console.log("Submitting registration data:", formattedData);
         const response = await register(formattedData);
+        console.log("Registration successful, response:", response);
 
         // Check if registration was successful
         if (response && response.user) {
-          // Navigate to User page
-          navigate("/User", { replace: true });
+          console.log("Navigating to User page");
+          // Navigate to User page with a slight delay to ensure state updates
+          setTimeout(() => {
+            navigate("/User", { replace: true });
+          }, 100);
         } else {
+          console.error("Registration response missing user data:", response);
           throw new Error("Registration failed: No user data received");
         }
       } catch (err) {

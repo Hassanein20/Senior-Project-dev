@@ -125,14 +125,32 @@ export const authAPI = {
       const response = await api.post("/auth/register", userData);
       console.log("Registration response:", response.data);
 
-      const { user, token } = response.data;
-      if (!token || !user) {
-        throw new Error("Invalid response from server");
+      // Extract token and user data from response
+      const { token, user, message } = response.data;
+
+      // If the user object is not directly in the response but nested in the "user" field
+      const userObject = user || response.data.user;
+
+      if (!token || !userObject) {
+        console.error(
+          "Invalid registration response structure:",
+          response.data
+        );
+        // Try to extract user data from the response if it's in a different format
+        if (response.data && response.data.id) {
+          // If the user data is directly in the response
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(response.data));
+          return { user: response.data, token };
+        }
+        throw new Error(
+          "Invalid response from server: missing token or user data"
+        );
       }
 
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      return response.data;
+      localStorage.setItem("user", JSON.stringify(userObject));
+      return { user: userObject, token, message };
     } catch (error) {
       console.error("Registration error:", error);
       if (error.response?.data?.error) {
@@ -182,6 +200,42 @@ export const authAPI = {
         throw new Error(error.response.data.error);
       }
       throw new Error("Failed to get profile. Please try again.");
+    }
+  },
+
+  getUserGoals: async () => {
+    try {
+      console.log("Fetching user goals...");
+      const response = await api.get("/user/goals");
+      console.log("User goals response:", response.data);
+
+      if (!response.data.goals) {
+        throw new Error("Invalid goals response");
+      }
+
+      return response.data.goals;
+    } catch (error) {
+      console.error("Get user goals error:", error);
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      throw new Error("Failed to get user goals. Please try again.");
+    }
+  },
+
+  updateUserGoals: async (goals) => {
+    try {
+      console.log("Updating user goals...", goals);
+      const response = await api.put("/user/goals", goals);
+      console.log("Update goals response:", response.data);
+
+      return response.data.goals;
+    } catch (error) {
+      console.error("Update goals error:", error);
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      throw new Error("Failed to update user goals. Please try again.");
     }
   },
 };

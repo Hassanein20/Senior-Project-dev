@@ -12,6 +12,7 @@ import (
 	config "HabitBite/backend/Config"
 	controllers "HabitBite/backend/Controllers"
 	middleware "HabitBite/backend/Middleware"
+	models "HabitBite/backend/Models"
 	repositories "HabitBite/backend/Repositories"
 
 	"github.com/gin-contrib/sessions"
@@ -51,8 +52,11 @@ func main() {
 	userRepo := repositories.NewUserRepository(db)
 	foodEntryRepo := repositories.NewFoodEntryRepository(db)
 
-	// Initialize controllers
-	authController := controllers.NewAuthController(userRepo, cfg)
+	// Initialize services
+	userService := models.NewUserService(userRepo)
+
+	// Initialize controllers with service instead of repository
+	authController := controllers.NewAuthControllerWithService(userService, cfg)
 	foodEntryController := controllers.NewFoodEntryController(foodEntryRepo)
 
 	// Create Gin router
@@ -123,6 +127,10 @@ func main() {
 		protected.GET("/consumed-foods/nutrition", foodEntryController.GetDailyNutrition)
 		protected.DELETE("/consumed-foods/:id", foodEntryController.DeleteFoodEntry)
 		protected.GET("/consumed-foods/history", foodEntryController.GetNutritionHistory)
+
+		// User routes
+		protected.GET("/user/goals", authController.GetUserGoals)
+		protected.PUT("/user/goals", authController.UpdateUserGoals)
 	}
 
 	// Create server with timeouts

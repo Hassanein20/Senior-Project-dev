@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 16, 2025 at 02:11 PM
+-- Generation Time: May 21, 2025 at 01:10 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -55,7 +55,12 @@ INSERT INTO `consumed_foods` (`id`, `user_id`, `food_id`, `food_name`, `quantity
 (22, 10, '2646170', 'Chicken, breast, boneless, skinless, raw', 125.00, 134.21, 28.13, 0.01, 2.41, '2025-05-16 14:22:02', '2025-05-16 14:22:02', '2025-05-16 14:22:02'),
 (23, 10, '2680464', 'MANGO', 80.00, 280.00, 2.00, 68.00, 0.01, '2025-05-16 14:25:00', '2025-05-16 14:24:59', '2025-05-16 14:24:59'),
 (24, 11, '2705849', 'Beef, stew meat', 200.00, 503.42, 56.78, 0.01, 30.70, '2025-05-16 14:47:19', '2025-05-16 14:47:19', '2025-05-16 14:47:19'),
-(25, 11, '2440097', 'WHITE RICE', 200.00, 675.76, 13.34, 155.60, 0.01, '2025-05-16 14:48:27', '2025-05-16 14:48:27', '2025-05-16 14:48:27');
+(25, 11, '2440097', 'WHITE RICE', 200.00, 675.76, 13.34, 155.60, 0.01, '2025-05-16 14:48:27', '2025-05-16 14:48:27', '2025-05-16 14:48:27'),
+(26, 10, '2709719', 'Tomatoes, raw', 200.00, 44.46, 1.64, 8.08, 0.62, '2025-05-16 16:53:15', '2025-05-16 16:53:14', '2025-05-16 16:53:14'),
+(30, 10, '2038064', 'CHICKEN', 148.00, 150.53, 31.67, 0.01, 2.65, '2025-05-18 22:06:02', '2025-05-18 22:06:02', '2025-05-18 22:06:02'),
+(31, 10, '2012128', 'BANANA', 100.00, 268.65, 12.50, 40.60, 6.25, '2025-05-18 22:33:21', '2025-05-18 22:33:21', '2025-05-18 22:33:21'),
+(32, 10, '2012128', 'BANANA', 100.00, 268.65, 12.50, 40.60, 6.25, '2025-05-20 08:14:10', '2025-05-20 08:14:09', '2025-05-20 08:14:09'),
+(33, 10, '2395464', 'CHICK SEITAN IN CHUNKS, CHICK', 100.00, 162.32, 26.30, 12.30, 0.88, '2025-05-21 01:43:23', '2025-05-21 01:43:22', '2025-05-21 01:43:22');
 
 -- --------------------------------------------------------
 
@@ -79,7 +84,12 @@ CREATE TABLE `daily_entries` (
 --
 
 INSERT INTO `daily_entries` (`id`, `user_id`, `entry_date`, `total_calories`, `total_protein`, `total_carbs`, `total_fats`, `notes`) VALUES
-(1, 10, '2025-05-14', 3000, 200.00, 300.00, 50.00, NULL);
+(1, 10, '2025-05-14', 3000, 200.00, 300.00, 50.00, NULL),
+(2, 10, '2025-05-16', 939, 48.07, 160.54, 11.64, NULL),
+(3, 10, '2025-05-15', 2500, 150.00, 200.00, 80.00, NULL),
+(4, 10, '2025-05-17', 0, 0.00, 0.00, 0.00, NULL),
+(6, 10, '2025-05-18', 419, 44.17, 40.61, 8.90, NULL),
+(7, 10, '2025-05-20', 269, 12.50, 40.60, 6.25, NULL);
 
 -- --------------------------------------------------------
 
@@ -115,8 +125,8 @@ INSERT INTO `users` (`id`, `email`, `username`, `password_hash`, `full_name`, `b
 (3, 'alex.nguyen@example.com', 'alex_wellness', '$2a$10$N9qo8uLOickgx3ZMRM7xEe6h6u/K7fB8Z4zJf7Q7JwYb5t7Q1Z/v2', 'Alex Nguyen', '1999-02-28', 'other', 175.30, 68.00, 'maintain', 'moderate', 2400, 'user', '2025-04-27 19:38:52', '2025-05-01 21:40:37'),
 (4, 'dr.nutrition@example.com', 'dr_wellness', '$2a$10$N9qo8uLOickgx3ZMRM7xEe6h6u/K7fB8Z4zJf7Q7JwYb5t7Q1Z/v2', 'Sarah Thompson', '1985-04-12', 'female', 170.20, 62.10, 'maintain', 'active', 2000, 'dietitian', '2025-04-27 19:38:52', '2025-05-01 21:40:37'),
 (5, 'admin.calorietrack@example.com', 'sysadmin_ctl', '$2a$10$N9qo8uLOickgx3ZMRM7xEe6h6u/K7fB8Z4zJf7Q7JwYb5t7Q1Z/v2', 'Robert Chen', '1990-07-22', 'male', 177.80, 81.60, 'maintain', 'moderate', 2000, 'admin', '2025-04-27 19:38:52', '2025-05-01 21:40:37'),
-(10, 'Hassanein@gmail.com', 'Hassanein', '$2a$10$1jNT6WQaFM3Z7stNULF9W.d39UE062YpqFuA/bklflGGZAVUfiaJ.', 'Hassanein Sharaf Al Dein', '1992-10-09', 'male', 183.60, 83.00, 'maintain', 'moderate', 2000, 'user', '2025-05-08 18:57:55', '2025-05-09 17:08:43'),
-(11, 'Ali@gmail.com', 'ali', '$2a$10$0LOvNgCOHCcJGCgFcY6bouf3iOu9U6UPdTPGoUxTjQHEa0FGF/Pl6', 'Ali Al Attar', '2009-11-14', 'male', 185.00, 75.00, 'gain', 'moderate', 180765, 'user', '2025-05-09 14:09:25', '2025-05-09 14:09:25'),
+(10, 'Hassanein@gmail.com', 'Hassanein', '$2a$10$1jNT6WQaFM3Z7stNULF9W.d39UE062YpqFuA/bklflGGZAVUfiaJ.', 'Hassanein Sharaf Al Dein', '1992-10-09', 'male', 183.60, 83.00, 'maintain', 'moderate', 2000, 'user', '2025-05-08 18:57:55', '2025-05-17 20:14:35'),
+(11, 'Ali@gmail.com', 'ali', '$2a$10$0LOvNgCOHCcJGCgFcY6bouf3iOu9U6UPdTPGoUxTjQHEa0FGF/Pl6', 'Ali Al Attar', '2009-11-14', 'male', 185.00, 75.00, 'gain', 'moderate', 180765, 'user', '2025-05-09 14:09:25', '2025-05-20 19:32:43'),
 (12, 'test1@gmail.com', 'test1', '$2a$10$ReUmAWrIGZmuQbHj18ZUL.71TgsPIFXrAcOc5P50ojgzhujDakSRC', 'test test test', '2001-01-01', 'female', 100.00, 100.00, 'lose', 'moderate', 1583, 'user', '2025-05-10 09:19:27', '2025-05-10 09:19:27'),
 (13, 'Hello@gmail.com', 'Hello', '$2a$10$Bvmi2Uk1d4ieaefKMDvys.1.Jk0duVHRTeqVGZj6YZRy0W9FuvsN2', 'Hello Hello Hello ', '2002-02-02', 'female', 140.00, 90.00, 'lose', 'light', 1561, 'user', '2025-05-10 09:28:51', '2025-05-10 09:28:51'),
 (14, 'MR@gmail.com', 'mr1', '$2a$10$vgVOnAHhDPj8hjI5/RdsaOrt4D9H2omnRWi1Uuu.i.ov2m0GIBLka', 'Mr Mr Mr ', '2003-03-03', 'female', 150.00, 75.00, 'gain', 'moderate', 2695, 'user', '2025-05-10 09:34:43', '2025-05-10 09:34:43'),
@@ -124,7 +134,13 @@ INSERT INTO `users` (`id`, `email`, `username`, `password_hash`, `full_name`, `b
 (16, 'test4@gmail.com', 'test4', '$2a$10$MOMo7PXp97XKuVV47EOF3eDMToWSPovSi/CCVocLKlT60DMEVTj8W', 'test test test', '2005-04-05', 'male', 150.00, 50.00, 'gain', 'light', 2345, 'user', '2025-05-10 09:43:22', '2025-05-10 09:43:22'),
 (17, 'test6@gmail.com', 'test6', '$2a$10$DQoW88XPBfGewSo5K995KeDqiHXBurthUdGzHl6MEm5a4cXnAV7UO', 'test test test', '2004-11-18', 'male', 168.90, 102.00, 'lose', 'active', 2907, 'user', '2025-05-10 09:48:30', '2025-05-10 09:48:30'),
 (18, 'test100@gmail.com', 'User100', '$2a$10$VXeQke9fVCg3n8RMdSmgxuSxGIwwHDVors44FyKTuIn8mvx5G0kiG', 'User User', '1993-03-01', 'male', 185.00, 80.00, 'maintain', 'active', 3107, 'user', '2025-05-15 05:20:29', '2025-05-15 05:20:29'),
-(19, 'test7@gmail.com', 'test7test', '$2a$10$a2dK6gMtN4IudL7tOxvFRehPo4aPTVIKCI5A1/mU/BMPkNFzTiOJ2', 'test test test', '2009-01-18', 'female', 170.00, 80.00, 'lose', 'active', 2297, 'user', '2025-05-15 06:58:36', '2025-05-15 06:58:36');
+(19, 'test7@gmail.com', 'test7test', '$2a$10$a2dK6gMtN4IudL7tOxvFRehPo4aPTVIKCI5A1/mU/BMPkNFzTiOJ2', 'test test test', '2009-01-18', 'female', 170.00, 80.00, 'lose', 'active', 2297, 'user', '2025-05-15 06:58:36', '2025-05-15 06:58:36'),
+(20, 'test8@gmail.com', 'test8', '$2a$10$68qdB6SVx4ltCIdErkSb8uoVJlIcc0R/uc.ByOx09V31eW54nfi1u', 'test test test ', '2005-11-07', 'female', 158.00, 61.00, 'lose', 'moderate', 1571, 'user', '2025-05-17 20:55:41', '2025-05-17 20:55:41'),
+(21, 'test9@gmail.com', 'test9', '$2a$10$/sJUizuSTO5kjVa5VIOq0eSbCpqJYxYawrh13KvuvYww82MFmlnM.', 'test test test ', '2009-11-10', 'male', 145.00, 90.00, 'lose', 'light', 1880, 'user', '2025-05-18 22:11:58', '2025-05-18 22:11:58'),
+(22, 'test10@gmail.com', 'test10', '$2a$10$2s0WJk8h2vJn5A.HDbLB9eWQoPwgCJG4T3XIwzPiZzHMfhW2d5mee', 'test test test ', '2009-03-19', 'male', 190.00, 90.00, 'lose', 'light', 2267, 'user', '2025-05-18 22:23:04', '2025-05-18 22:23:04'),
+(23, 'test12@gmail.com', 'test12', '$2a$10$PwSU5zyQprGwXHfDd8f/yOagtgqiLcCduRZX.CNXvIBgZnw/.5B/y', 'test test test ', '1999-06-05', 'male', 190.00, 100.00, 'lose', 'moderate', 2696, 'user', '2025-05-20 19:21:57', '2025-05-20 19:21:57'),
+(24, 'Admin@Admin.com', 'Admin', '$2a$10$oZy5/q7kmAmIm3Np1KmJcethDRL2a4FAIlTViMc0L2W8xsLg5/B.m', 'Admin ', '2000-01-09', 'male', 180.00, 80.00, 'maintain', 'moderate', 2797, 'admin', '2025-05-20 21:19:28', '2025-05-20 21:20:58'),
+(25, 'Deititian@Deititian.com', 'Deititian', '$2a$10$29ZuEByTOebRxrTN/j9eHuW5m3gNapMrF5c425UE4txv52PRs/Exu', 'Dietitian', '2000-01-01', 'male', 180.00, 180.00, 'maintain', 'moderate', 4347, 'dietitian', '2025-05-20 21:23:24', '2025-05-20 21:32:47');
 
 -- --------------------------------------------------------
 
@@ -158,7 +174,14 @@ CREATE TABLE `user_goals` (
 --
 
 INSERT INTO `user_goals` (`user_id`, `target_calories`, `target_protein`, `target_carbs`, `target_fats`, `target_weight`) VALUES
-(10, 4000, 200.00, 300.00, 50.00, 87.00);
+(10, 2000, 200.00, 300.00, 50.00, 87.00),
+(11, 180765, 999.99, 999.99, 999.99, 75.00),
+(20, 1571, 0.00, 0.00, 0.00, 61.00),
+(21, 1880, 0.00, 0.00, 0.00, 90.00),
+(22, 2267, 0.00, 0.00, 0.00, 90.00),
+(23, 2696, 235.90, 202.20, 104.84, 100.00),
+(24, 2797, 174.81, 349.63, 77.69, 80.00),
+(25, 4347, 271.69, 543.38, 120.75, 180.00);
 
 --
 -- Indexes for dumped tables
@@ -210,19 +233,19 @@ ALTER TABLE `user_goals`
 -- AUTO_INCREMENT for table `consumed_foods`
 --
 ALTER TABLE `consumed_foods`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `daily_entries`
 --
 ALTER TABLE `daily_entries`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- Constraints for dumped tables

@@ -19,8 +19,9 @@ import (
 
 // AuthController handles authentication-related operations
 type AuthController struct {
-	userRepo repositories.UserRepository
-	config   *config.Config
+	userRepo    repositories.UserRepository
+	userService *models.UserService
+	config      *config.Config
 }
 
 // NewAuthController creates a new AuthController
@@ -28,6 +29,14 @@ func NewAuthController(repo repositories.UserRepository, cfg *config.Config) *Au
 	return &AuthController{
 		userRepo: repo,
 		config:   cfg,
+	}
+}
+
+// NewAuthControllerWithService creates a new AuthController using the UserService
+func NewAuthControllerWithService(service *models.UserService, cfg *config.Config) *AuthController {
+	return &AuthController{
+		userService: service,
+		config:      cfg,
 	}
 }
 
@@ -84,9 +93,17 @@ func (ac *AuthController) Register(c *gin.Context) {
 	}
 
 	// Check if user already exists
-	existingUser, err := ac.userRepo.FindByEmail(c.Request.Context(), req.Email)
-	if err != nil && !errors.Is(err, repositories.ErrUserNotFound) {
-		log.Printf("Error checking if user exists: %v", err)
+	var existingUser *models.User
+	var checkErr error
+
+	if ac.userService != nil {
+		existingUser, checkErr = ac.userService.FindUserByEmail(c.Request.Context(), req.Email)
+	} else {
+		existingUser, checkErr = ac.userRepo.FindByEmail(c.Request.Context(), req.Email)
+	}
+
+	if checkErr != nil && !errors.Is(checkErr, repositories.ErrUserNotFound) {
+		log.Printf("Error checking if user exists: %v", checkErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check user existence"})
 		return
 	}
@@ -96,28 +113,33 @@ func (ac *AuthController) Register(c *gin.Context) {
 		return
 	}
 
+	// Calculate daily calorie goal
+	dailyCalorieGoal := calculateDailyCalorieGoal(
+		req.Weight,
+		req.Height,
+		req.Gender,
+		time.Now().Year()-birthdate.Year(),
+		req.ActivityLevel,
+		req.GoalType,
+	)
+
+	log.Printf("Calculated daily calorie goal: %d", dailyCalorieGoal)
+
 	// Create user
 	user := &models.User{
-		Email:         req.Email,
-		Username:      req.Username,
-		FullName:      req.FullName,
-		Birthdate:     birthdate,
-		Gender:        req.Gender,
-		Height:        req.Height,
-		Weight:        req.Weight,
-		GoalType:      req.GoalType,
-		ActivityLevel: req.ActivityLevel,
-		Role:          models.RoleUser,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
-		DailyCalorieGoal: calculateDailyCalorieGoal(
-			req.Weight,
-			req.Height,
-			req.Gender,
-			time.Now().Year()-birthdate.Year(),
-			req.ActivityLevel,
-			req.GoalType,
-		),
+		Email:            req.Email,
+		Username:         req.Username,
+		FullName:         req.FullName,
+		Birthdate:        birthdate,
+		Gender:           req.Gender,
+		Height:           req.Height,
+		Weight:           req.Weight,
+		GoalType:         req.GoalType,
+		ActivityLevel:    req.ActivityLevel,
+		Role:             models.RoleUser,
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
+		DailyCalorieGoal: dailyCalorieGoal,
 	}
 
 	// Set password
@@ -128,7 +150,14 @@ func (ac *AuthController) Register(c *gin.Context) {
 	}
 
 	log.Printf("Attempting to create user in database with data: %+v", user)
-	if err := ac.userRepo.CreateUser(c.Request.Context(), user); err != nil {
+
+	if ac.userService != nil {
+		err = ac.userService.CreateUser(c.Request.Context(), user)
+	} else {
+		err = ac.userRepo.CreateUser(c.Request.Context(), user)
+	}
+
+	if err != nil {
 		log.Printf("Error creating user: %v", err)
 		if errors.Is(err, repositories.ErrUserAlreadyExists) {
 			c.JSON(http.StatusConflict, gin.H{"error": "Username or email already exists"})
@@ -159,20 +188,9 @@ func (ac *AuthController) Register(c *gin.Context) {
 	}
 
 	// Return success response with user data and tokens
+	authUser := user.ToAuthUser()
 	c.JSON(http.StatusCreated, gin.H{
-		"user": gin.H{
-			"id":            user.ID,
-			"email":         user.Email,
-			"username":      user.Username,
-			"fullName":      user.FullName,
-			"birthdate":     user.Birthdate.Format("2006-01-02"),
-			"gender":        user.Gender,
-			"height":        user.Height,
-			"weight":        user.Weight,
-			"goalType":      user.GoalType,
-			"activityLevel": user.ActivityLevel,
-			"role":          user.Role,
-		},
+		"user":    authUser,
 		"token":   accessToken,
 		"message": "User registered successfully",
 	})
@@ -196,16 +214,18 @@ func (ac *AuthController) Login(c *gin.Context) {
 	log.Printf("Login attempt for email: %s", email)
 
 	// Find user by email
-	user, err := ac.userRepo.FindByEmail(c.Request.Context(), email)
-	if err != nil {
-		if errors.Is(err, repositories.ErrUserNotFound) {
-			log.Printf("User not found for email: %s", email)
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-			return
-		}
+	var user *models.User
+	var err error
 
-		log.Printf("Error finding user: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Authentication failed"})
+	if ac.userService != nil {
+		user, err = ac.userService.FindUserByEmail(c.Request.Context(), email)
+	} else {
+		user, err = ac.userRepo.FindByEmail(c.Request.Context(), email)
+	}
+
+	if err != nil {
+		log.Printf("User not found: %v", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
 	}
 
@@ -235,20 +255,9 @@ func (ac *AuthController) Login(c *gin.Context) {
 	}
 
 	// Return user data and access token
+	authUser := user.ToAuthUser()
 	c.JSON(http.StatusOK, gin.H{
-		"user": gin.H{
-			"id":            user.ID,
-			"email":         user.Email,
-			"username":      user.Username,
-			"fullName":      user.FullName,
-			"birthdate":     user.Birthdate.Format("2006-01-02"),
-			"gender":        user.Gender,
-			"height":        user.Height,
-			"weight":        user.Weight,
-			"goalType":      user.GoalType,
-			"activityLevel": user.ActivityLevel,
-			"role":          user.Role,
-		},
+		"user":  authUser,
 		"token": accessToken,
 	})
 }
@@ -286,7 +295,15 @@ func (ac *AuthController) GetCurrentUser(c *gin.Context) {
 	}
 
 	// Get user from database
-	user, err := ac.userRepo.FindByID(c.Request.Context(), int(id))
+	var user *models.User
+	var err error
+
+	if ac.userService != nil {
+		user, err = ac.userService.FindByID(c.Request.Context(), int(id))
+	} else {
+		user, err = ac.userRepo.FindByID(c.Request.Context(), int(id))
+	}
+
 	if err != nil {
 		if errors.Is(err, repositories.ErrUserNotFound) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
@@ -321,7 +338,15 @@ func (ac *AuthController) RefreshToken(c *gin.Context) {
 	}
 
 	// Get user from database
-	user, err := ac.userRepo.FindByID(c.Request.Context(), int(id))
+	var user *models.User
+	var err error
+
+	if ac.userService != nil {
+		user, err = ac.userService.FindByID(c.Request.Context(), int(id))
+	} else {
+		user, err = ac.userRepo.FindByID(c.Request.Context(), int(id))
+	}
+
 	if err != nil {
 		if errors.Is(err, repositories.ErrUserNotFound) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
@@ -507,4 +532,178 @@ func (ac *AuthController) setRefreshTokenCookie(c *gin.Context, token string) {
 		true, // secure
 		true, // httpOnly
 	)
+}
+
+// GetUserGoals handles retrieving user goals
+func (ac *AuthController) GetUserGoals(c *gin.Context) {
+	// Get user ID from context (set by AuthMiddleware)
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Convert to float64 then int as JWT claims are stored as float64
+	userIDFloat, ok := userIDValue.(float64)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	userID := int(userIDFloat)
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var goals *models.UserGoals
+	var err error
+
+	if ac.userService != nil {
+		goals, err = ac.userService.GetUserGoals(c.Request.Context(), userID)
+	} else {
+		goals, err = ac.userRepo.GetUserGoals(c.Request.Context(), userID)
+	}
+
+	if err != nil {
+		log.Printf("Error getting user goals: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user goals"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"goals": goals})
+}
+
+// UpdateUserGoals handles updating user goals
+func (ac *AuthController) UpdateUserGoals(c *gin.Context) {
+	// Get user ID from context (set by AuthMiddleware)
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Convert to float64 then int as JWT claims are stored as float64
+	userIDFloat, ok := userIDValue.(float64)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	userID := int(userIDFloat)
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var goals models.UserGoals
+	if err := c.ShouldBindJSON(&goals); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
+		return
+	}
+
+	// Ensure the user ID matches
+	goals.UserID = userID
+
+	var err error
+	if ac.userService != nil {
+		err = ac.userService.UpdateUserGoals(c.Request.Context(), &goals)
+	} else {
+		err = ac.userRepo.UpdateUserGoals(c.Request.Context(), &goals)
+	}
+
+	if err != nil {
+		log.Printf("Error updating user goals: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user goals"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Goals updated successfully", "goals": goals})
+}
+
+// RecalculateAllUserGoals updates the macronutrient targets for all users
+func (ac *AuthController) RecalculateAllUserGoals(c *gin.Context) {
+	// Only allow admin users to access this endpoint
+	userRole, exists := c.Get("userRole")
+	if !exists || userRole != models.RoleAdmin {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+		return
+	}
+
+	// Get users one by one using the repository methods
+	// This is a bit slower but avoids direct DB access
+	// Get user IDs first (assuming we have at least one user with ID 1)
+	maxUserID := 100 // Reasonable upper limit for user IDs
+	updatedCount := 0
+	failedCount := 0
+
+	// Process each potential user ID
+	for userID := 1; userID <= maxUserID; userID++ {
+		// Try to find the user
+		user, err := ac.userRepo.FindByID(c.Request.Context(), userID)
+		if err != nil {
+			// Skip if user not found
+			if errors.Is(err, repositories.ErrUserNotFound) {
+				continue
+			}
+			// Log other errors
+			log.Printf("Error finding user %d: %v", userID, err)
+			failedCount++
+			continue
+		}
+
+		// Calculate macronutrient targets based on goal type
+		var targetProtein, targetCarbs, targetFats float64
+		caloriesFromProtein := 4.0 // 4 calories per gram of protein
+		caloriesFromCarbs := 4.0   // 4 calories per gram of carbs
+		caloriesFromFats := 9.0    // 9 calories per gram of fat
+
+		switch user.GoalType {
+		case "lose":
+			// For weight loss: protein 35%, fats 35%, carbs 30%
+			targetProtein = float64(user.DailyCalorieGoal) * 0.35 / caloriesFromProtein
+			targetFats = float64(user.DailyCalorieGoal) * 0.35 / caloriesFromFats
+			targetCarbs = float64(user.DailyCalorieGoal) * 0.30 / caloriesFromCarbs
+		case "maintain":
+			// For weight maintenance: protein 25%, fats 25%, carbs 50%
+			targetProtein = float64(user.DailyCalorieGoal) * 0.25 / caloriesFromProtein
+			targetFats = float64(user.DailyCalorieGoal) * 0.25 / caloriesFromFats
+			targetCarbs = float64(user.DailyCalorieGoal) * 0.50 / caloriesFromCarbs
+		case "gain":
+			// For weight gain: protein 30%, fats 25%, carbs 45%
+			targetProtein = float64(user.DailyCalorieGoal) * 0.30 / caloriesFromProtein
+			targetFats = float64(user.DailyCalorieGoal) * 0.25 / caloriesFromFats
+			targetCarbs = float64(user.DailyCalorieGoal) * 0.45 / caloriesFromCarbs
+		default:
+			// Default to maintenance if goal type is invalid
+			targetProtein = float64(user.DailyCalorieGoal) * 0.25 / caloriesFromProtein
+			targetFats = float64(user.DailyCalorieGoal) * 0.25 / caloriesFromFats
+			targetCarbs = float64(user.DailyCalorieGoal) * 0.50 / caloriesFromCarbs
+		}
+
+		// Create or update user goals
+		goals := &models.UserGoals{
+			UserID:         user.ID,
+			TargetCalories: user.DailyCalorieGoal,
+			TargetProtein:  targetProtein,
+			TargetCarbs:    targetCarbs,
+			TargetFats:     targetFats,
+			TargetWeight:   user.Weight,
+		}
+
+		// Use the repository's UpdateUserGoals method
+		err = ac.userRepo.UpdateUserGoals(c.Request.Context(), goals)
+		if err != nil {
+			log.Printf("Error updating goals for user %d: %v", user.ID, err)
+			failedCount++
+		} else {
+			updatedCount++
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User goals recalculated",
+		"updated": updatedCount,
+		"failed":  failedCount,
+	})
 }

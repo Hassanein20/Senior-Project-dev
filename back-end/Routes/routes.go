@@ -36,6 +36,9 @@ func SetupRoutes(router *gin.Engine, db *sqlx.DB, cfg *config.Config) {
 		// User routes
 		protected.GET("/profile", authController.GetCurrentUser)
 		protected.POST("/auth/refresh", authController.RefreshToken)
+		protected.GET("/user/goals", authController.GetUserGoals)
+		protected.PUT("/user/goals", authController.UpdateUserGoals)
+		protected.POST("/admin/recalculate-goals", authController.RecalculateAllUserGoals)
 
 		// Food entry routes
 		protected.POST("/food-entries", foodEntryController.AddFoodEntry)
